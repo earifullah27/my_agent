@@ -3,339 +3,820 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ekosistem AI Agent · Ery Arifullah</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<title>Peta Ekosistem Agen — Ery Arifullah</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#EDEAE2;--surface:#F8F6F0;--surface2:#FAFAF6;
-  --border:#D4D2C9;--border2:#BAB8AF;
-  --text:#1E1D1A;--text2:#5A5955;--text3:#9A9893;
-  --r:12px;--rs:8px;
-}
-body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:32px 20px;font-size:14px;line-height:1.6}
-.wrap{max-width:720px;margin:0 auto}
+  :root{
+    --bg:#0e1418;
+    --panel:#151d23;
+    --panel-2:#1b262e;
+    --line:#2b3a44;
+    --line-soft:#223038;
+    --ink:#e6edf1;
+    --ink-dim:#8fa2ad;
+    --ink-faint:#5f727d;
+    --router:#e0a13c;      /* amber — routers */
+    --bilateral:#4bb3a7;   /* teal — bilateral-only emitters */
+    --terminal:#6f8aa8;    /* slate blue — terminal */
+    --meta:#a77bb8;        /* violet — meta / non-routing */
+    --edge-auto:#4bb3a7;   /* autonomous edge */
+    --edge-ery:#c96f5a;    /* Ery-mediated edge */
+    --edge-generic:#5f727d;/* generic/undefined reception */
+    --focus:#f2c14e;
+    --mono:"SFMono-Regular",ui-monospace,"Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+    --sans:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  a{color:inherit}
 
-/* HEADER */
-.hd{display:flex;align-items:baseline;gap:14px;margin-bottom:24px}
-.hd h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:600;letter-spacing:-0.01em;line-height:1}
-.hd span{font-size:12px;color:var(--text3);font-style:italic}
+  /* ---------- Masthead ---------- */
+  header.masthead{
+    padding:26px 28px 20px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:16px 32px;
+  }
+  .title-wrap h1{
+    font-size:23px;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  .title-wrap .sub{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-faint);
+    letter-spacing:0.02em;
+  }
+  .masthead-meta{
+    display:flex;
+    gap:26px;
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--ink-dim);
+  }
+  .masthead-meta .m-num{
+    display:block;
+    font-size:20px;
+    color:var(--ink);
+    font-weight:600;
+    line-height:1.1;
+  }
+  .masthead-meta .m-lbl{font-size:10.5px;color:var(--ink-faint);letter-spacing:0.04em}
 
-/* MAP */
-.mc{background:var(--surface2);border-radius:var(--r) var(--r) 0 0;border:0.5px solid var(--border);border-bottom:none;overflow:hidden}
-.mc svg{display:block;width:100%}
-.nd{cursor:pointer}.nd rect{transition:stroke-width .12s,filter .12s}
-.nd:hover rect{stroke-width:2.5px!important;filter:brightness(0.95)}
-.ah{cursor:crosshair}
+  /* ---------- Layout ---------- */
+  .wrap{display:flex;min-height:calc(100vh - 92px)}
+  .stage{flex:1;position:relative;min-width:0}
+  .side{
+    width:360px;
+    flex:0 0 360px;
+    border-left:1px solid var(--line);
+    background:var(--panel);
+    display:flex;
+    flex-direction:column;
+    max-height:calc(100vh - 92px);
+    position:sticky;
+    top:0;
+  }
 
-/* LEGEND */
-.leg{display:flex;gap:18px;padding:9px 16px;background:#F1EFE8;border:0.5px solid var(--border);border-top:none;border-radius:0 0 var(--r) var(--r);flex-wrap:wrap;align-items:center;margin-bottom:18px;font-size:11.5px;color:var(--text2)}
-.li{display:flex;align-items:center;gap:7px}
-.lh{margin-left:auto;color:var(--text3);font-style:italic;font-size:11px}
+  svg{display:block;width:100%;height:100%;min-height:560px}
 
-/* TOOLTIP */
-#tip{position:fixed;background:rgba(20,19,17,.96);color:#f0efe8;padding:13px 16px;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:12px;max-width:320px;pointer-events:none;z-index:9999;display:none;line-height:1.65;box-shadow:0 8px 32px rgba(0,0,0,.28);border:0.5px solid rgba(255,255,255,.1)}
-#tip .tt{font-size:12.5px;font-weight:500;color:#fff;margin-bottom:8px;padding-bottom:7px;border-bottom:0.5px solid rgba(255,255,255,.15)}
-#tip .tb{color:#C5C3BC;font-size:11.5px}
-#tip .tb strong{color:#EAE8E2;font-weight:500}
+  /* ---------- Controls ---------- */
+  .controls{
+    position:absolute;
+    top:16px;left:16px;
+    z-index:5;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    max-width:250px;
+  }
+  .legend{
+    background:rgba(21,29,35,0.92);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 13px;
+    backdrop-filter:blur(4px);
+  }
+  .legend h3{
+    font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--ink-faint);margin:0 0 9px;font-weight:600;
+  }
+  .legend .row{display:flex;align-items:center;gap:9px;font-size:12px;margin:6px 0;color:var(--ink-dim)}
+  .swatch{width:12px;height:12px;border-radius:3px;flex:0 0 12px}
+  .swatch.line{height:0;border-top-width:2px;border-top-style:solid;border-radius:0;width:18px}
+  .swatch.dash{border-top-style:dashed}
 
-/* INPUT PANEL */
-.ip{background:var(--surface);border-radius:var(--r);border:0.5px solid var(--border);overflow:hidden}
-.ih{padding:20px 22px 16px;border-bottom:0.5px solid var(--border)}
-.ih h2{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;letter-spacing:-0.01em;color:var(--text);margin-bottom:4px;line-height:1.2}
-.ih p{font-size:12.5px;color:var(--text3)}
-.ib{padding:16px 22px 20px}
-.iw{position:relative;border:1.5px solid var(--border);border-radius:var(--r);background:var(--bg);transition:border-color .15s,box-shadow .15s}
-.iw:focus-within{border-color:var(--border2);box-shadow:0 0 0 3px rgba(30,29,26,.05)}
-#ci{display:block;width:100%;min-height:84px;max-height:200px;padding:13px 58px 13px 16px;background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);resize:vertical;line-height:1.65}
-#ci::placeholder{color:var(--text3);font-style:italic}
-.sb{position:absolute;right:10px;bottom:10px;width:36px;height:36px;background:var(--text);color:var(--surface);border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:background .15s,transform .1s}
-.sb:hover{background:#3A3936}.sb:active{transform:scale(.94)}
-.hint{margin-top:8px;font-size:11.5px;color:var(--text3);font-style:italic}
+  .filters{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{
+    font-family:var(--mono);
+    font-size:11px;
+    border:1px solid var(--line);
+    background:var(--panel-2);
+    color:var(--ink-dim);
+    padding:5px 9px;
+    border-radius:20px;
+    cursor:pointer;
+    user-select:none;
+    transition:all .12s ease;
+  }
+  .chip:hover{border-color:var(--ink-faint);color:var(--ink)}
+  .chip[aria-pressed="true"]{background:var(--focus);border-color:var(--focus);color:#1a1205;font-weight:600}
 
-/* RESULT */
-#rp{display:none;margin-top:14px;padding:13px 15px;background:#F1EFE8;border-radius:var(--rs);border:0.5px solid var(--border);animation:fu .25s ease}
-@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.rl{font-size:10.5px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
-#rr{font-size:13.5px;color:var(--text);line-height:1.65;margin-bottom:10px}
-#ra{display:flex;gap:7px;flex-wrap:wrap}
-.ab{display:inline-flex;align-items:center;gap:5px;padding:4px 12px 4px 9px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid;cursor:default}
-.ab::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
-.ab.s{opacity:.65;font-style:italic}
+  /* ---------- Nodes ---------- */
+  .node{cursor:pointer}
+  .node .node-body{transition:opacity .18s ease, stroke-width .1s ease}
+  .node .letter{font-family:var(--sans);font-weight:700;fill:#0e1418;text-anchor:middle;dominant-baseline:central}
+  .node .label{font-family:var(--sans);font-size:12px;fill:var(--ink);text-anchor:middle;font-weight:500}
+  .node .domain{font-family:var(--mono);font-size:10px;fill:var(--ink-faint);text-anchor:middle}
+  .node.dim{opacity:0.16}
+  .node.hot .node-body{stroke:var(--focus);stroke-width:3}
+  .ery-hub circle{fill:var(--panel-2);stroke:var(--line);stroke-width:1.5;stroke-dasharray:3 4}
+  .ery-hub text{font-family:var(--mono);font-size:11px;fill:var(--ink-dim);text-anchor:middle;dominant-baseline:central;letter-spacing:0.05em}
 
-/* SECTION DIVIDER */
-.sdiv{font-size:11px;color:var(--text3);text-align:center;padding:10px 0 14px;letter-spacing:.04em}
+  /* ---------- Edges ---------- */
+  .edge{fill:none;transition:opacity .18s ease}
+  .edge.dim{opacity:0.06}
+  .edge.hot{opacity:1 !important}
+  .edge-hit{fill:none;stroke:transparent;stroke-width:14;cursor:pointer}
+
+  /* ---------- Side panel ---------- */
+  .side-head{padding:18px 20px 14px;border-bottom:1px solid var(--line-soft)}
+  .side-head .eyebrow{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.04em}
+  .side-head h2{margin:6px 0 2px;font-size:18px;font-weight:600}
+  .side-body{padding:16px 20px 28px;overflow-y:auto;flex:1}
+  .pill{
+    display:inline-block;font-family:var(--mono);font-size:10.5px;
+    padding:3px 8px;border-radius:5px;margin:0 6px 6px 0;letter-spacing:0.02em;
+  }
+  .pill.k-router{background:rgba(224,161,60,0.16);color:var(--router);border:1px solid rgba(224,161,60,0.4)}
+  .pill.k-bilateral{background:rgba(75,179,167,0.16);color:var(--bilateral);border:1px solid rgba(75,179,167,0.4)}
+  .pill.k-terminal{background:rgba(111,138,168,0.16);color:var(--terminal);border:1px solid rgba(111,138,168,0.4)}
+  .pill.k-meta{background:rgba(167,123,184,0.16);color:var(--meta);border:1px solid rgba(167,123,184,0.4)}
+  .field{margin:16px 0 0}
+  .field .f-lbl{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink-faint);margin-bottom:5px}
+  .field .f-val{font-size:13.5px;color:var(--ink);line-height:1.55}
+  .edge-list{list-style:none;margin:6px 0 0;padding:0}
+  .edge-list li{
+    font-size:12.5px;padding:7px 0;border-bottom:1px solid var(--line-soft);
+    display:flex;align-items:baseline;gap:9px;
+  }
+  .edge-list li:last-child{border-bottom:none}
+  .eid{font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex:0 0 42px}
+  .etag{font-family:var(--mono);font-size:9.5px;padding:1px 6px;border-radius:4px;margin-left:auto;white-space:nowrap}
+  .etag.auto{background:rgba(75,179,167,0.15);color:var(--bilateral)}
+  .etag.ery{background:rgba(201,111,90,0.15);color:var(--edge-ery)}
+  .etag.generic{background:rgba(95,114,125,0.18);color:var(--ink-dim)}
+  .etag.pre{background:rgba(242,193,78,0.13);color:var(--focus)}
+  .placeholder{color:var(--ink-faint);font-size:13px;line-height:1.6}
+  .placeholder strong{color:var(--ink-dim);font-weight:600}
+  .foot-note{padding:14px 20px;border-top:1px solid var(--line-soft);font-size:11px;color:var(--ink-faint);font-family:var(--mono);line-height:1.6}
+
+  /* ---------- Tabs ---------- */
+  .tabs{display:flex;border-bottom:1px solid var(--line-soft)}
+  .tab{
+    flex:1;text-align:center;padding:11px 8px;font-size:12.5px;font-weight:500;
+    color:var(--ink-faint);cursor:pointer;border-bottom:2px solid transparent;
+    user-select:none;transition:color .12s ease,border-color .12s ease;
+  }
+  .tab:hover{color:var(--ink-dim)}
+  .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--focus)}
+  .tab .t-hint{display:block;font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);margin-top:2px}
+  .panel[hidden]{display:none}
+
+  /* ---------- Router panel ---------- */
+  .router-body{padding:16px 20px 24px;overflow-y:auto;flex:1}
+  .router-intro{font-size:12.5px;color:var(--ink-dim);line-height:1.55;margin:0 0 12px}
+  .router-input{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;
+    color:var(--ink);font-family:var(--sans);font-size:13.5px;line-height:1.5;
+    padding:11px 12px;resize:vertical;min-height:88px;
+  }
+  .router-input:focus{outline:none;border-color:var(--focus)}
+  .router-input::placeholder{color:var(--ink-faint)}
+  .router-actions{display:flex;gap:8px;margin-top:10px}
+  .btn{
+    font-family:var(--sans);font-size:13px;font-weight:600;border-radius:7px;cursor:pointer;
+    padding:9px 15px;border:1px solid transparent;transition:filter .12s ease;
+  }
+  .btn-primary{background:var(--focus);color:#1a1205}
+  .btn-primary:hover{filter:brightness(1.08)}
+  .btn-ghost{background:transparent;border-color:var(--line);color:var(--ink-dim)}
+  .btn-ghost:hover{border-color:var(--ink-faint);color:var(--ink)}
+  .examples{margin-top:14px}
+  .examples .ex-lbl{font-family:var(--mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:7px}
+  .ex-chip{
+    display:inline-block;font-size:11.5px;color:var(--ink-dim);background:var(--panel-2);
+    border:1px solid var(--line);border-radius:16px;padding:5px 10px;margin:0 6px 6px 0;cursor:pointer;
+  }
+  .ex-chip:hover{border-color:var(--ink-faint);color:var(--ink)}
+
+  .result-head{font-family:var(--mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-faint);margin:20px 0 10px}
+  .rec-card{
+    border:1px solid var(--line);border-radius:9px;background:var(--panel-2);
+    padding:13px 14px;margin-bottom:10px;
+  }
+  .rec-card.primary{border-color:var(--focus)}
+  .rec-top{display:flex;align-items:center;gap:10px}
+  .rec-badge{
+    width:30px;height:30px;border-radius:7px;flex:0 0 30px;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:15px;color:#0e1418;
+  }
+  .rec-name{font-size:14px;font-weight:600}
+  .rec-dom{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint)}
+  .rec-role{margin-left:auto;font-family:var(--mono);font-size:9.5px;padding:2px 7px;border-radius:5px}
+  .rec-why{font-size:12px;color:var(--ink-dim);line-height:1.5;margin:9px 0 0}
+  .rec-why .hit{color:var(--focus);font-weight:600}
+  .rec-order{font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex:0 0 auto}
+  .chain{margin:6px 0 0;padding:10px 12px;border-left:2px solid var(--line);background:rgba(27,38,46,0.5);border-radius:0 6px 6px 0}
+  .chain-step{display:flex;align-items:center;gap:8px;font-size:12px;padding:3px 0;color:var(--ink-dim)}
+  .chain-arrow{font-family:var(--mono);font-size:12px}
+  .chain-arrow.auto{color:var(--edge-auto)}
+  .chain-arrow.ery{color:var(--edge-ery)}
+  .chain-arrow.generic{color:var(--ink-faint)}
+  .chain-note{font-family:var(--mono);font-size:10px;color:var(--ink-faint);margin-left:auto}
+  .no-match{font-size:12.5px;color:var(--ink-faint);line-height:1.6;padding:12px 0}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:920px){
+    .wrap{flex-direction:column}
+    .side{width:100%;flex:0 0 auto;border-left:none;border-top:1px solid var(--line);position:static;max-height:none}
+    .stage{min-height:520px}
+    svg{min-height:520px}
+    .masthead-meta{gap:18px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-<header class="hd">
-  <h1>Ekosistem AI Agent · Ery</h1>
-  <span>10 agent · L2a–L2j · interactive routing map</span>
+<header class="masthead">
+  <div class="title-wrap">
+    <h1>Peta Ekosistem Agen Claude</h1>
+    <div class="sub">Ery Arifullah · Foundation: Routing Protocol v1.13 · Glossary v1.8</div>
+  </div>
+  <div class="masthead-meta">
+    <div><span class="m-num">12</span><span class="m-lbl">agen (A–L)</span></div>
+    <div><span class="m-num">11</span><span class="m-lbl">dalam graf routing (A–K)</span></div>
+    <div><span class="m-num">19</span><span class="m-lbl">edge terdaftar (E-01…E-19)</span></div>
+  </div>
 </header>
 
-<!-- ════════════════════ MAP ════════════════════ -->
-<div class="mc">
-<svg viewBox="0 0 720 670">
-<defs>
-  <marker id="ma" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-    <path d="M2 1L8 5L2 9" fill="none" stroke="#1D4ED8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  </marker>
-  <marker id="mb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-    <path d="M2 1L8 5L2 9" fill="none" stroke="#15803D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  </marker>
-  <marker id="mc" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-    <path d="M2 1L8 5L2 9" fill="none" stroke="#B45309" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  </marker>
-</defs>
-
-<!-- BILATERAL amber dashed -->
-<path d="M525 160 L525 148 L160 148 L160 160" fill="none" stroke="#B45309" stroke-width="1.5" stroke-dasharray="6 3" marker-start="url(#mc)" marker-end="url(#mc)"/>
-<line x1="100" y1="212" x2="280" y2="480" stroke="#B45309" stroke-width="1.5" stroke-dasharray="6 3" marker-start="url(#mc)" marker-end="url(#mc)"/>
-
-<!-- DOWNSTREAM green -->
-<line x1="160" y1="186" x2="190" y2="186" stroke="#15803D" stroke-width="1.5" marker-end="url(#mb)"/>
-<line x1="520" y1="346" x2="495" y2="346" stroke="#15803D" stroke-width="1.5" marker-end="url(#mb)"/>
-<line x1="265" y1="212" x2="330" y2="480" stroke="#15803D" stroke-width="1.5" marker-end="url(#mb)"/>
-<line x1="595" y1="372" x2="340" y2="480" stroke="#15803D" stroke-width="1.5" marker-end="url(#mb)"/>
-<path d="M675 186 L678 186 L678 470 L415 470 L415 480" fill="none" stroke="#15803D" stroke-width="1.5" marker-end="url(#mb)"/>
-
-<!-- PRIMARY D routing blue, thicker -->
-<path d="M265 50 L5 50 L5 346 L10 346" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ma)"/>
-<line x1="290" y1="76" x2="85" y2="160" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ma)"/>
-<line x1="335" y1="76" x2="265" y2="160" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ma)"/>
-<line x1="395" y1="76" x2="600" y2="160" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ma)"/>
-<line x1="400" y1="76" x2="420" y2="320" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ma)"/>
-
-<!-- J routing: D.AN→J right-side down, A→J via top, J→D right-side up -->
-<path d="M415 50 L710 50 L710 616 L605 616" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ma)"/>
-<path d="M160 186 L160 10 L518 10 L518 590" fill="none" stroke="#15803D" stroke-width="1.5" marker-end="url(#mb)"/>
-<path d="M605 590 L706 590 L706 44 L415 44" fill="none" stroke="#B45309" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#mc)"/>
-
-<!-- HIT AREAS transparent wide -->
-<path class="ah" data-aid="EA" d="M525 160 L525 148 L160 148 L160 160" fill="none" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<line class="ah" data-aid="AH" x1="100" y1="212" x2="280" y2="480" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<line class="ah" data-aid="AB" x1="160" y1="186" x2="190" y2="186" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<line class="ah" data-aid="GF" x1="520" y1="346" x2="495" y2="346" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<line class="ah" data-aid="BH" x1="265" y1="212" x2="330" y2="480" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<line class="ah" data-aid="GH" x1="595" y1="372" x2="340" y2="480" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<path class="ah" data-aid="EH" d="M675 186 L678 186 L678 470 L415 470 L415 480" fill="none" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<path class="ah" data-aid="DC" d="M265 50 L5 50 L5 346 L10 346" fill="none" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<line class="ah" data-aid="DA" x1="290" y1="76" x2="85" y2="160" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<line class="ah" data-aid="DB" x1="335" y1="76" x2="265" y2="160" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<line class="ah" data-aid="DE" x1="395" y1="76" x2="600" y2="160" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<line class="ah" data-aid="DF" x1="400" y1="76" x2="420" y2="320" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<path class="ah" data-aid="DAJ" d="M415 50 L710 50 L710 616 L605 616" fill="none" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<path class="ah" data-aid="AJ" d="M160 186 L160 10 L518 10 L518 590" fill="none" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-<path class="ah" data-aid="JD" d="M605 590 L706 590 L706 44 L415 44" fill="none" stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="all"/>
-
-<!-- NODES drawn last to stay on top -->
-<g id="nd-D" class="nd" data-nid="D"><rect x="265" y="24" width="150" height="52" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/><text x="340" y="40" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" fill="#2C2C2A">Agent D · L2d</text><text x="340" y="60" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="11" fill="#5F5E5A">Knowledge &amp; Dialogue</text></g>
-
-<g id="nd-A" class="nd" data-nid="A"><rect x="10" y="160" width="150" height="52" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.5"/><text x="85" y="176" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" fill="#0C447C">Agent A · L2a</text><text x="85" y="196" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="11" fill="#185FA5">Academic Research</text></g>
-
-<g id="nd-B" class="nd" data-nid="B"><rect x="190" y="160" width="150" height="52" rx="8" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.5"/><text x="265" y="176" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" fill="#3C3489">Agent B · L2c</text><text x="265" y="196" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="11" fill="#534AB7">Science Communication</text></g>
-
-<g id="nd-E" class="nd" data-nid="E"><rect x="525" y="160" width="150" height="52" rx="8" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/><text x="600" y="176" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" fill="#412402">Agent E · L2f</text><text x="600" y="196" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="11" fill="#854F0B">Startup &amp; Business</text></g>
-
-<g id="nd-C" class="nd" data-nid="C"><rect x="10" y="320" width="150" height="52" rx="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/><text x="85" y="336" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" fill="#085041">Agent C · L2b</text><text x="85" y="356" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="11" fill="#0F6E56">Teaching &amp; Pedagogy</text></g>
-
-<g id="nd-F" class="nd" data-nid="F"><rect x="345" y="320" width="150" height="52" rx="8" fill="#FAECE7" stroke="#D85A30" stroke-width="0.5"/><text x="420" y="336" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" fill="#4A1B0C">Agent F · L2g</text><text x="420" y="356" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="11" fill="#993C1D">Creative Writing</text></g>
-
-<g id="nd-G" class="nd" data-nid="G"><rect x="520" y="320" width="150" height="52" rx="8" fill="#EAF3DE" stroke="#639922" stroke-width="0.5"/><text x="595" y="336" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" fill="#173404">Agent G · L2h</text><text x="595" y="356" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="11" fill="#3B6D11">Islamic Studies</text></g>
-
-<g id="nd-H" class="nd" data-nid="H"><rect x="265" y="480" width="150" height="52" rx="8" fill="#FBEAF0" stroke="#D4537E" stroke-width="0.5"/><text x="340" y="496" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" fill="#4B1528">Agent H · L2e</text><text x="340" y="516" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="11" fill="#993556">Prof. Communication</text></g>
-
-<g id="nd-I" class="nd" data-nid="I"><rect x="265" y="590" width="150" height="52" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="1.5" stroke-dasharray="5 2"/><text x="340" y="606" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" fill="#501313">Agent I</text><text x="340" y="626" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="11" fill="#791F1F">Cross-Domain Eval.</text></g>
-
-<g id="nd-J" class="nd" data-nid="J"><rect x="455" y="590" width="150" height="52" rx="8" fill="#E8EEF8" stroke="#3B5EA6" stroke-width="0.5"/><text x="530" y="606" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" fill="#1A2F5E">Agent J · L2j</text><text x="530" y="626" text-anchor="middle" dominant-baseline="central" font-family="'DM Sans',sans-serif" font-size="11" fill="#3B5EA6">Statistical Analysis</text></g>
-</svg>
-</div>
-
-<!-- LEGEND -->
-<div class="leg">
-  <div class="li"><svg width="30" height="12" style="flex-shrink:0"><line x1="0" y1="6" x2="22" y2="6" stroke="#1D4ED8" stroke-width="2.5"/><polygon points="30,6 22,3 22,9" fill="#1D4ED8"/></svg>D primary routing</div>
-  <div class="li"><svg width="30" height="12" style="flex-shrink:0"><line x1="0" y1="6" x2="22" y2="6" stroke="#15803D" stroke-width="2"/><polygon points="30,6 22,3 22,9" fill="#15803D"/></svg>Downstream routing</div>
-  <div class="li"><svg width="30" height="12" style="flex-shrink:0"><polygon points="0,6 8,3 8,9" fill="#B45309"/><line x1="8" y1="6" x2="22" y2="6" stroke="#B45309" stroke-width="2" stroke-dasharray="4 2"/><polygon points="30,6 22,3 22,9" fill="#B45309"/></svg>Bilateral coordination</div>
-  <div class="lh">Hover node atau garis untuk detail lengkap</div>
-</div>
-
-<!-- INPUT PANEL -->
-<div class="ip">
-  <div class="ih">
-    <h2>Apa yang akan Ery kerjakan atau pikirkan?</h2>
-    <p>Sistem memetakan agent-agent yang relevan secara otomatis saat Ery mengetik</p>
-  </div>
-  <div class="ib">
-    <div class="iw">
-      <textarea id="ci" placeholder="Ketik tugas atau pikiran Ery... contoh: 'Saya ingin menulis review article geologi Kutai' · 'Analisis PCA data paleontologi saya' · 'Bagaimana model bisnis startup edukasi?' · 'Saya memikirkan tafsir Surah Al-Baqarah' · 'Evaluasi kualitas paper yang baru saya tulis'"></textarea>
-      <button class="sb" onclick="doA()" title="Analisis (Ctrl+Enter)">→</button>
+<div class="wrap">
+  <div class="stage">
+    <div class="controls">
+      <div class="legend">
+        <h3>Peran arsitektur</h3>
+        <div class="row"><span class="swatch" style="background:var(--router)"></span> Router (inisiasi otonom)</div>
+        <div class="row"><span class="swatch" style="background:var(--bilateral)"></span> Bilateral-only emitter</div>
+        <div class="row"><span class="swatch" style="background:var(--terminal)"></span> Terminal</div>
+        <div class="row"><span class="swatch" style="background:var(--meta)"></span> Meta · non-routing</div>
+      </div>
+      <div class="legend">
+        <h3>Jenis edge</h3>
+        <div class="row"><span class="swatch line" style="border-top-color:var(--edge-auto)"></span> Otonom (agen mengemisi)</div>
+        <div class="row"><span class="swatch line dash" style="border-top-color:var(--edge-ery)"></span> Ery-mediated</div>
+        <div class="row"><span class="swatch line dash" style="border-top-color:var(--edge-generic)"></span> Reception generik / pre-established</div>
+      </div>
+      <div class="legend">
+        <h3>Saring peran</h3>
+        <div class="filters" id="filters">
+          <span class="chip" data-k="router" aria-pressed="false">router</span>
+          <span class="chip" data-k="bilateral" aria-pressed="false">bilateral</span>
+          <span class="chip" data-k="terminal" aria-pressed="false">terminal</span>
+          <span class="chip" data-k="meta" aria-pressed="false">meta</span>
+        </div>
+      </div>
     </div>
-    <div class="hint">Analisis otomatis 600ms setelah berhenti mengetik &nbsp;·&nbsp; Ctrl+Enter untuk analisis segera</div>
-    <div id="rp">
-      <div class="rl">Rekomendasi Routing</div>
-      <div id="rr"></div>
-      <div id="ra"></div>
-    </div>
+    <svg id="graph" viewBox="0 0 900 760" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagram jaringan 12 agen">
+      <defs>
+        <marker id="arrow-auto" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--edge-auto)"/>
+        </marker>
+        <marker id="arrow-ery" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--edge-ery)"/>
+        </marker>
+        <marker id="arrow-generic" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--edge-generic)"/>
+        </marker>
+      </defs>
+      <g id="edges"></g>
+      <g id="nodes"></g>
+    </svg>
   </div>
-</div>
 
-<div class="sdiv">Ekosistem AI Agent · Ery Arifullah · 10 agent L2a–L2j</div>
-</div>
+  <aside class="side">
+    <div class="tabs" role="tablist">
+      <div class="tab" id="tab-router" role="tab" aria-selected="true" tabindex="0">Router tugas<span class="t-hint">ketik → arahkan</span></div>
+      <div class="tab" id="tab-detail" role="tab" aria-selected="false" tabindex="0">Detail node<span class="t-hint">klik peta</span></div>
+    </div>
 
-<!-- FLOATING TOOLTIP -->
-<div id="tip"><div class="tt" id="tit"></div><div class="tb" id="tib"></div></div>
+    <!-- ROUTER PANEL -->
+    <div class="panel" id="panel-router" role="tabpanel">
+      <div class="router-body">
+        <p class="router-intro">Tuliskan apa yang akan Ery kerjakan atau pikirkan. Sistem mencocokkannya dengan domain agen dan menyarankan agen primer beserta rantai hilir yang biasanya terlibat.</p>
+        <textarea class="router-input" id="task-input" placeholder="mis. Menyusun surat permohonan pembebasan ikatan dinas ke UPN Yogyakarta…"></textarea>
+        <div class="router-actions">
+          <button class="btn btn-primary" id="route-btn">Arahkan</button>
+          <button class="btn btn-ghost" id="clear-btn">Bersihkan</button>
+        </div>
+        <div class="examples">
+          <div class="ex-lbl">Contoh cepat</div>
+          <div id="ex-chips"></div>
+        </div>
+        <div id="route-results"></div>
+      </div>
+      <div class="foot-note">
+        Pencocokan berbasis kosakata domain (deterministik, luring). Rantai hilir mengikuti Edge Registry §3.2 / Content Pipeline. Saran, bukan perintah — Ery tetap otoritas final (§2.5).
+      </div>
+    </div>
+
+    <!-- DETAIL PANEL -->
+    <div class="panel" id="panel-detail" role="tabpanel" hidden>
+      <div class="side-head">
+        <div class="eyebrow" id="side-eyebrow">Pilih node</div>
+        <h2 id="side-title">Ekosistem 12 agen</h2>
+      </div>
+      <div class="side-body" id="side-body">
+        <p class="placeholder">
+          Klik sebuah <strong>agen</strong> untuk melihat domain, peran arsitektur, dan edge masuk/keluarnya. Klik sebuah <strong>garis edge</strong> untuk detail status routing-nya.<br><br>
+          Seluruh transfer bersifat manual melalui Ery (<span style="font-family:var(--mono);color:var(--ink-dim)">§2.1 Manual Transfer</span>) — hub di pusat mewakili Ery sebagai otoritas final (<span style="font-family:var(--mono);color:var(--ink-dim)">§2.5</span>). Agen tidak pernah mengeksekusi routing secara otomatis; mereka mengusulkan, Ery mengonfirmasi dan mentransfer.
+        </p>
+      </div>
+      <div class="foot-note">
+        Sumber: Ecosystem_Routing_Protocol_v1.13 · Ecosystem_Shared_Glossary_v1.8. Klasifikasi terminal per §3.5; status edge per §3.2.
+      </div>
+    </div>
+  </aside>
+</div>
 
 <script>
-/* ── DATA ── */
-const ARR={
-DA:{t:'D → A · Primary Routing',b:'<strong>Aktivasi:</strong> Mode DI mendeteksi J4 Maturity Signal untuk penulisan akademik.<br><strong>Trigger:</strong> Sintesis literatur matang, argumen metodologi terbentuk, gap riset teridentifikasi, kerangka teori tersusun.<br><strong>Action:</strong> Agent A menetapkan genre L3 dan memulai Execution Engine (3 fase · 11 langkah · 4 Quality Gates).<br><strong>Contoh:</strong> Eksplorasi geologi Kutai → A dengan L3h Narrative Review atau L3p IMRAD.'},
-DB:{t:'D → B · Primary Routing',b:'<strong>Aktivasi:</strong> Mode DI menghasilkan konten sains populer siap dipublikasikan.<br><strong>Trigger:</strong> Konsep ilmiah tersusun komunikatif, audiens dan platform target sudah teridentifikasi, analogi sudah jelas.<br><strong>Action:</strong> Agent B memformat ke 9 platform dengan SM-01–04 dan L3 genre yang sesuai (L3k, L3c, dll.).'},
-DC:{t:'D → C · Primary Routing',b:'<strong>Aktivasi:</strong> Mode DI menghasilkan insight pedagogis matang — konsep siap diajarkan.<br><strong>Trigger:</strong> Tujuan pembelajaran jelas, urutan materi terpetakan, level Bloom teridentifikasi, kebutuhan assessment terlihat.<br><strong>Action:</strong> Agent C eksekusi ke EC-02 RPS, EC-03 Session Plan, EC-04 Materials, atau EC-05 Assessment (S1/S2/S3/NF).'},
-DE:{t:'D → E · Primary Routing',b:'<strong>Aktivasi:</strong> Mode DI menghasilkan insight bisnis matang — model teridentifikasi, hipotesis pasar tersusun.<br><strong>Trigger:</strong> Canvas tersusun, strategi positioning jelas, target pasar teridentifikasi, unique value proposition terbentuk.<br><strong>Action:</strong> Agent E eksekusi ke BM-01 (Pitch), BM-02 (Strategy), BM-03 (Market), atau BM-04 (SOP/OKR/Roadmap).'},
-DF:{t:'D → F · Primary Routing',b:'<strong>Aktivasi:</strong> Mode DI menghasilkan benih esai — refleksi personal atau insight kehidupan yang matang naratif dan emosional.<br><strong>Trigger:</strong> Insight kehidupan kuat, refleksi spiritual mendalam, material memoir terstruktur, sudut pandang personal sudah khas.<br><strong>Action:</strong> Agent F eksekusi ke CM-01 (Memoir), CM-04 (Personal Essay), atau CM-04+L3n (Spiritual Reflective Essay).'},
-AB:{t:'A → B · Downstream: Content Adaptation',b:'<strong>Alur:</strong> Output akademik Agent A diadaptasi menjadi konten populer untuk publik umum.<br><strong>Mekanisme:</strong> SM-02 Adaptation Pipeline — re-format ke register publik, simplifikasi teknis, penambahan narasi dan guidance visual.<br><strong>Contoh:</strong> L3p Scientific Paper (geologi) → L3k Popular Science untuk Medium atau LinkedIn. Review article → Twitter/X thread.<br><strong>Note:</strong> Ery konfirmasi sebelum Agent B memulai adaptasi.'},
-GF:{t:'G → F · Downstream: Spiritual Essay Seeds',b:'<strong>Alur:</strong> Kajian mendalam Agent G menghasilkan benih refleksi spiritual yang potensial menjadi esai personal.<br><strong>Mekanisme:</strong> G mendeteksi potensi esai saat QM-04 atau QM-07 menghasilkan insight personal kuat → G memberi sinyal eksplisit → Ery konfirmasi → F CM-04+L3n aktif.<br><strong>Pembagian domain:</strong> G menganalisis teks Qur\'an dan hadis; F menulis esai personal dari insight tersebut.'},
-BH:{t:'B → H · Downstream: Formal Packaging',b:'<strong>Alur:</strong> Output Agent B memerlukan kemasan formal institusional untuk pengiriman atau pelaporan resmi.<br><strong>Contoh:</strong> Artikel Medium perlu surat pengantar ke redaksi; laporan sosialisasi sains perlu format resmi ke institusi.<br><strong>Action:</strong> Agent H PM-01 (Email formal) atau PM-03 (Formal Letter). Register: formal akademik atau formal institusional.'},
-GH:{t:'G → H · Downstream: Islamic Correspondence',b:'<strong>Alur:</strong> Kegiatan Islamic studies memerlukan korespondensi formal yang profesional.<br><strong>Contoh:</strong> Undangan seminar kajian Islam, laporan kegiatan kajian Qur\'an ke institusi, korespondensi kolaborasi penelitian Islamic studies.<br><strong>Action:</strong> Agent H PM-01 (Email) atau PM-03 (Formal Letter). Register: formal akademik untuk korespondensi institusional Islam.'},
-EH:{t:'E → H · Downstream: Business Documents',b:'<strong>Alur:</strong> Dokumen bisnis Agent E memerlukan format profesional formal siap kirim ke stakeholder.<br><strong>Contoh:</strong> Business proposal → surat pengantar formal; MoU → perjanjian resmi; OKR quarterly → executive briefing.<br><strong>Action:</strong> Agent H PM-01, PM-02, atau PM-03 sesuai jenis dokumen. Register: bisnis profesional.'},
-EA:{t:'E ↔ A · Bilateral: BM-03 Data Verification',b:'<strong>E → A:</strong> Agent E BM-03 Market Analysis menemukan data yang perlu verifikasi ilmiah → Agent A mengevaluasi kualitas sumber dan metodologi → hasil dikembalikan dengan label [DATA TERVERIFIKASI] atau [PERLU SUMBER PRIMER].<br><strong>A → E:</strong> Agent A menemukan data riset (geologi, sosial, sains) yang relevan untuk konteks bisnis Ery → memberi flag ke Agent E.<br><strong>Frekuensi:</strong> Tinggi saat BM-03 melibatkan data teknis berbasis riset sains.'},
-AH:{t:'A ↔ H · Bilateral: SC-01 Collaboration',b:'<strong>H → A:</strong> Agent H SC-01 menyusun Response to Reviewers → memerlukan argumen ilmiah presisi dari Agent A untuk menjawab setiap poin kritik reviewer dengan bukti dan referensi tepat.<br><strong>A → H:</strong> Agent A menyelesaikan draft manuskrip → Agent H SC-01 menyiapkan cover letter, author statement, dan korespondensi resmi dengan editor jurnal.<br><strong>Frekuensi:</strong> Paling aktif saat submission ke jurnal internasional atau saat menerima revisi.'},
-DAJ:{t:'D.AN → J · Primary Routing (Mode AN)',b:'<strong>Tipe:</strong> Primary routing dari Agent D via Mode AN — mode khusus untuk statistical routing.<br><strong>Aktivasi:</strong> Saat Ery membutuhkan analisis statistik berbasis data, D tidak mengeksekusi sendiri melainkan menghasilkan signal [ROUTE:D.AN→J].<br><strong>Action:</strong> J diaktifkan dengan session code yang sesuai — [GEO] untuk domain geosains atau [BIZ] untuk domain bisnis.<br><strong>Catatan:</strong> Mode AN adalah satu-satunya mode D yang berfungsi sebagai router murni — tidak mengeksekusi, langsung meneruskan ke J.'},
-AJ:{t:'A → J · Downstream: Statistical Analysis Request',b:'<strong>Tipe:</strong> Downstream routing dari Academic Research ke Statistical Engine.<br><strong>Alur:</strong> Agent A mengidentifikasi kebutuhan analisis statistik dalam proses riset akademik → mengirim data ke Agent J untuk eksekusi.<br><strong>Contoh:</strong> Paper geosains membutuhkan PCA atau cluster analysis terhadap data paleontologi → A→J aktif; hasil J dikembalikan ke A untuk diinterpretasikan dan dimasukkan ke manuskrip.<br><strong>Session code:</strong> [GEO] aktif untuk domain geosains Ery (geologi Kutai, PAST v4.0).'},
-JD:{t:'J → D · Coordination: [READY FOR D] Handoff',b:'<strong>Tipe:</strong> Bilateral coordination signal — J mengirim notifikasi ke D saat analisis statistik selesai.<br><strong>Signal:</strong> [READY FOR D] — J mengirimkan hasil analisis yang sudah selesai ke D untuk interpretasi ilmiah atau bisnis yang lebih luas.<br><strong>Pembagian peran yang ketat:</strong> J mengeksekusi metodologi statistik; D menginterpretasikan hasil dalam konteks teoritis dan praktis.<br><strong>Note:</strong> Bukan aliran data besar — sinyal koordinasi yang memicu D untuk mengambil dan menginterpretasikan output J.'}
+// ============ DATA (from Routing Protocol v1.13 §3.5 + §3.2, Glossary v1.8 §12.2) ============
+const AGENTS = {
+  A:{name:"Academic Research", domain:"L2a", kind:"router",
+     desc:"Orchestrator riset akademis — manuskrip ilmiah. Hulu konten pipeline sains (paper → esai populer → konten platform).",
+     emits:"A→B (E-15), A→K (E-17), A→J (E-08), A↔H (E-10)"},
+  B:{name:"Science Communication", domain:"L2c", kind:"terminal", sub:"zero-emission",
+     desc:"Esai geosains populer (mis. Kutai Basin). Terminal: menerima paper dari A/D, mengembalikan output ke Ery. Berpangkal pada dua edge Ery-mediated (→K, →H).",
+     emits:"Nol. E-16 & E-19 Ery-mediated (B tidak emit)."},
+  C:{name:"Teaching & Pedagogy", domain:"L2b", kind:"terminal", sub:"return-capable",
+     desc:"Materi kuliah geologi/geofisika & pelatihan ASN. Terminal — hanya membalas sinyal reception.",
+     emits:"Hanya [READY FOR D] (E-03)"},
+  D:{name:"Knowledge Extraction", domain:"L2d", kind:"router",
+     desc:"Ekstraksi pengetahuan & dialog intelektual — hulu intelektual dengan enam edge keluar. Penghasil terberat label epistemik.",
+     emits:"D→A/B/C/E/F, D.AN→J, D→K"},
+  E:{name:"Startup & Business Strategy", domain:"L2f", kind:"bilateral",
+     desc:"Strategi bisnis & startup (mis. produk basis data stratigrafi Kutai). Emisi otonom hanya pada satu edge bilateral pre-established dengan A.",
+     emits:"Hanya E-11 (E↔A) — nol lainnya"},
+  F:{name:"Creative Writing Partner", domain:"L2g", kind:"terminal", sub:"return-capable",
+     desc:"Mitra penulisan kreatif & craft (mis. esai 'merdeka'). Kalibrasi epistemik per-genre. Terminal.",
+     emits:"Hanya [READY FOR D] (E-05)"},
+  G:{name:"Islamic & Qur'anic Studies", domain:"L2h", kind:"terminal", sub:"zero-emission · originator murni",
+     desc:"Kajian keislaman & Al-Qur'an. Sistem epistemik tiga-tier native ([JUMHUR]/[KHILAF]/[SPEKULATIF]) + grade hadis. Nol edge terdaftar di kedua arah.",
+     emits:"Nol edge; nol [ROUTE:G→X]"},
+  H:{name:"Professional Communication", domain:"L2e", kind:"bilateral",
+     desc:"Korespondensi & dokumen dinas formal (mis. surat mutasi UPN Yogyakarta). Emisi otonom hanya pada E-10 bilateral dengan A.",
+     emits:"Hanya E-10 (A↔H, SC-01) — nol lainnya"},
+  I:{name:"Document Evaluator", domain:"—", kind:"terminal", sub:"zero-emission · emisi dilarang",
+     desc:"Evaluator dokumen & asesmen (mis. koherensi PKP-25). Terminus evaluasi: masuk dari mana pun, keluar ke Ery. Gate 5 melarang semua emisi.",
+     emits:"Nol — [EVAL COMPLETE:X] adalah label reception Ery-mediated, bukan emisi I"},
+  J:{name:"Statistical Analysis Engine", domain:"L2j", kind:"terminal", sub:"return-capable · pure execution",
+     desc:"Mesin analitik kuantitatif (geosains, sektor publik, biaya hidup). 83 metode terdaftar. Pure execution — kedua edge keluar adalah return signal.",
+     emits:"[READY FOR D] (E-07), [READY FOR A] (E-09)"},
+  K:{name:"Social Media & Content", domain:"L2c-SM", kind:"terminal", sub:"return-capable (kondisional)",
+     desc:"Konten media sosial sains & kebijakan (pipeline carousel). Menurunkan konten A/B/D jadi format platform. Terminal.",
+     emits:"[READY FOR A] sah; [READY FOR D] tertangguh"},
+  L:{name:"Coaching & Mentoring", domain:"meta", kind:"meta", sub:"zero-emission · human-facing",
+     desc:"Meta-agent coaching karier, klien tunggal Ery. Non-routing: di luar graf A–K, nol edge, nol reception. Node Addition v1.13.",
+     emits:"Nol edge di kedua arah; non-routing"}
 };
 
-const ND={
-D:{t:'Agent D · L2d · Upstream Router',b:'<strong>Misi:</strong> Memproses pikiran mentah Ery → insight terstruktur siap eksekusi. Tidak menghasilkan output final.<br><br><strong>Mode EX:</strong> Ekstraksi pasif dari sumber — atribusi lengkap, tanpa critique, tanpa interpretasi tambahan.<br><br><strong>Mode DI — Layers aktif:</strong><br>E — Socratic questioning<br>F — Hypothesis generation<br>G — Cross-domain analogy<br>H — Contradiction detection<br>I — Devil\'s Advocate<br>J — Metacognitive (J4 = routing signal)<br>K — Drive search proaktif<br>L — Web search proaktif<br><br><strong>J4 Maturity Signal:</strong> Insight matang → routing otomatis ke A/B/C/E/F'},
-A:{t:'Agent A · L2a · Academic Research',b:'<strong>Misi:</strong> Penulisan ilmiah panjang dengan citation integrity yang ketat.<br><br><strong>L3 Genres (8):</strong><br>L3a Review Article · L3b Literature/Book Review · L3e Interpretative Essay · L3g Monograf · L3h Narrative Review · L3i Narrative Synthesis · L3l Reflective Essay · L3p Scientific Paper IMRAD<br><br><strong>Execution Engine:</strong> 3 fase · 11 langkah · 4 Quality Gates<br><strong>Priority constraint:</strong> Citation integrity — tidak pernah fabrikasi referensi apapun<br><strong>Upload:</strong> L2a + 8 L3 files + L3_routing.xml'},
-B:{t:'Agent B · L2c · Science Communication',b:'<strong>Misi:</strong> Konten sains berbasis riset untuk berbagai platform digital.<br><br><strong>SM Modes:</strong> SM-01 Create · SM-02 Adapt · SM-03 Planning · SM-04 Analysis<br><br><strong>9 Platform:</strong> Instagram · Twitter/X · LinkedIn · YouTube · TikTok · Facebook · Threads · Mastodon · Medium<br><br><strong>L3 Genres (long-form):</strong> L3c Opinion · L3d Historical · L3j Personal Intellectual · L3k Popular Scientific · L3m Argumentative · L3o Thematic<br><br><strong>Upload:</strong> 6 L3 files + B_L3_Routing.xml (tanpa L2c file)'},
-C:{t:'Agent C · L2b · Teaching & Pedagogy',b:'<strong>Misi:</strong> Desain pembelajaran berkualitas, sesuai jenjang, terstandarisasi nasional.<br><br><strong>Coverage:</strong> S1 (Bloom C1–C3) · S2 (C4–C5) · S3 (C6) · EDU-NF (CBT/SKKNI)<br><br><strong>EC Task Types:</strong> EC-01 Curriculum · EC-02 RPS/Silabus · EC-03 Session Plan · EC-04 Materials · EC-05 Assessment · EC-06 Course Mapping · EC-07 Feedback<br><br><strong>Framework:</strong> Bloom\'s · Constructive Alignment · OBE · SN-Dikti No. 3/2020<br><strong>Upload:</strong> Tidak ada L2/L3 file (embedded dalam system prompt)'},
-E:{t:'Agent E · L2f · Startup & Business',b:'<strong>Misi:</strong> Business execution layer — dari idea ke dokumen bisnis siap pakai.<br><br><strong>BM Modes:</strong><br>BM-01 Pitch Material (deck, executive summary)<br>BM-02 Business Model & Strategy (BMC, SWOT)<br>BM-03 Market Analysis (sizing, segmentation)<br>BM-04 Operational Planning (SOP, OKR, roadmap, KPI)<br><br><strong>Epistemic:</strong> Strategic claims di-flag · [DATA DIPERLUKAN] wajib saat tidak ada sumber<br><strong>Upload:</strong> L2f + E_L3_Routing.xml (virtual L3)'},
-F:{t:'Agent F · L2g · Creative Writing',b:'<strong>Misi:</strong> Penulisan kreatif yang mempertahankan voice Ery secara konsisten dan otentik.<br><br><strong>CM Modes:</strong> CM-01 Memoir · CM-02 Fiction · CM-03 Poetry · CM-04 Personal Essay · CM-05 Structural Planning · CM-06 Voice Development · CM-07 Revision<br><br><strong>L3 Files:</strong> L3f Memoir · L3j Personal Essay · L3n Spiritual Reflective<br><strong>Unik:</strong> Mengelola Voice Fingerprint Ery. Tidak ada downstream — output adalah produk final.<br><strong>Upload:</strong> L2g + F_L3_Routing.xml + L3f + L3j + L3n'},
-G:{t:'Agent G · L2h · Islamic Studies',b:'<strong>Misi:</strong> Kajian Qur\'an dan studi Islam dengan standar keilmuan internal yang ketat.<br><br><strong>QM Modes:</strong> QM-01 Mufradat · QM-02 Ijmali · QM-03 Tahlili · QM-04 Mawdhu\'i (Tematik) · QM-05 Hadis · QM-06 Cross-Reference · QM-07 Applied<br><br><strong>Reference Library L2h:</strong> R1 Tafsir Klasik · R2 Kontemporer · R3 Hadis · R4 Ulum Quran · R5 Bahasa Arab · R6 Fiqh · R7 Islamic Intellectual History<br><br><strong>Epistemic Labels:</strong> [JUMHUR] · [KHILAF] · [SPEKULATIF]<br><strong>Hard Constraint:</strong> Tidak pernah fabrikasi matan hadis, sanad, atau pendapat ulama<br><strong>Upload:</strong> L2h + G_L3_Routing.xml'},
-H:{t:'Agent H · L2e · Professional Communication',b:'<strong>Misi:</strong> Output layer ekosistem — dokumen komunikasi formal siap dikirim.<br><br><strong>PM Modes:</strong> PM-01 Email & Correspondence · PM-02 Report Writing · PM-03 Formal Letter · PM-04 Revision & Tone<br><br><strong>SC Modes:</strong> SC-01 Response to Reviewers · SC-02 Recommendation Letters · SC-03 Difficult Communications<br><br><strong>Register Calibration:</strong> Formal akademik · Formal bisnis · Formal administratif · Profesional netral<br><strong>Menerima dari:</strong> A (SC-01) · B (packaging) · E (business docs) · G (Islamic corr.)<br><strong>Upload:</strong> L2e + H_L3_Routing.xml'},
-I:{t:'Agent I · Cross-Domain Document Evaluator',b:'<strong>Misi:</strong> Mengevaluasi dokumen dari agent manapun dalam ekosistem dan mengembalikan hasil evaluasi terstruktur ke agent pengirim.<br><br><strong>Input (on-demand dari semua agent):</strong><br>A — paper ilmiah · B — konten platform · C — RPS/silabus · D — insight terstruktur · E — dokumen bisnis · F — karya tulis · G — kajian Islam · H — korespondensi formal<br><br><strong>Evaluasi mencakup:</strong> Kualitas konten · Konsistensi internal · Kelengkapan struktural · Alignment tujuan ekosistem · Cross-domain relevance check<br><br><strong>Output:</strong> Evaluasi terstruktur dikembalikan ke agent pengirim sebagai feedback loop.<br><strong>Domain:</strong> Standalone — tidak ada kode L2. Koneksi ke semua agent bersifat on-demand (tidak ditampilkan sebagai panah tetap untuk menjaga keterbacaan visual peta).'},
-J:{t:'Agent J · L2j · Statistical Analysis Engine',b:'<strong>Misi:</strong> Eksekusi analisis statistik untuk domain GEO (geosains) dan BIZ (bisnis).<br><br><strong>Session Codes:</strong> [GEO] geosains · [BIZ] bisnis · [LEARN] edukasi metodologi<br><strong>Modifiers:</strong> [DETAIL] output lengkap · [BRIEF] ringkasan<br><br><strong>GEO Registry:</strong> PAST v4.0 — 38 metode statistik geosains dan paleontologi<br><strong>BIZ Registry:</strong> Internal v1.0 — 22 metode statistik bisnis dan data analisis<br><br><strong>Understanding Layer:</strong> Wajib hadir di setiap output (interpretasi konteks sebelum eksekusi metodologi)<br><br><strong>Routing masuk:</strong> D.AN → J · A → J<br><strong>Routing keluar:</strong> J → D via [READY FOR D]<br><strong>Pembagian peran:</strong> J eksekusi metodologi · D interpretasi ilmiah/bisnis · E strategi bisnis'}
+// Edge registry (§3.2). tier: auto | ery | generic | pre | undef
+const EDGES = [
+  {id:"E-01", from:"D", to:"A", tier:"undef",   cat:"Primary",     note:"Belum terimplementasi (reception A untuk D→A belum diaudit)."},
+  {id:"E-02", from:"D", to:"B", tier:"generic", cat:"Primary",     note:"Reception siap (generik) — B aktif & terverifikasi; edge D→B belum diuji smoke test."},
+  {id:"E-03", from:"D", to:"C", tier:"auto",    cat:"Primary",     note:"Reception siap (diuji) — C v3.1 smoke test. Return [READY FOR D]."},
+  {id:"E-04", from:"D", to:"E", tier:"undef",   cat:"Primary",     note:"Belum terimplementasi."},
+  {id:"E-05", from:"D", to:"F", tier:"generic", cat:"Primary",     note:"Return [READY FOR D] dari F (terminal return-capable)."},
+  {id:"E-06", from:"D", to:"J", tier:"auto",    cat:"Bilateral",   note:"D.AN→J. J siap. Pasangan return E-07."},
+  {id:"E-07", from:"J", to:"D", tier:"auto",    cat:"Bilateral",   note:"[READY FOR D] — return signal, bukan inisiasi."},
+  {id:"E-08", from:"A", to:"J", tier:"auto",    cat:"Downstream",  note:"A→J. Pasangan return E-09."},
+  {id:"E-09", from:"J", to:"A", tier:"auto",    cat:"Downstream",  note:"[READY FOR A] — return signal."},
+  {id:"E-10", from:"A", to:"H", tier:"pre",     cat:"Bilateral",   note:"A↔H:SC-01 — pre-established (memori). Satu-satunya emisi otonom H.", bidir:true},
+  {id:"E-11", from:"E", to:"A", tier:"pre",     cat:"Bilateral",   note:"E↔A:BM-03 — pre-established (memori). Satu-satunya emisi otonom E.", bidir:true},
+  {id:"E-12", from:"__ANY__", to:"I", tier:"ery", cat:"On-demand", note:"ANY→I. Ery-mediated — reception-ready; nihil pengirim otonom (audit 11 agen, FD-14). Ery menyusun payload & transfer."},
+  {id:"E-13", from:"I", to:"__ANY__", tier:"ery", cat:"On-demand", note:"I→ANY. [EVAL COMPLETE:X] — label reception Ery-mediated; I terminal tak mengemisi (§3.5, Gate 5). Ery menyusun & transfer ke peminta X."},
+  {id:"E-15", from:"A", to:"B", tier:"auto",    cat:"Pipeline",    note:"A→B (paper → esai populer). Reception diuji (B v1.0 TEST 1); sending A lunas (SP A v2.4 Block 9.8)."},
+  {id:"E-16", from:"B", to:"K", tier:"ery",     cat:"Pipeline",    note:"B→K. Ery-mediated — B terminal, tidak emit (§3.3). Reception K diuji. Tanpa return signal."},
+  {id:"E-17", from:"A", to:"K", tier:"generic", cat:"Pipeline",    note:"A→K (langsung, melewati B). Reception generik; sending A lunas (SP A v2.4 Block 9.9)."},
+  {id:"E-18", from:"D", to:"K", tier:"generic", cat:"Primary",     note:"D→K. Reception generik; sending D lunas (SP D v2.5 §10.7, diuji E-18-1-REDO)."},
+  {id:"E-19", from:"B", to:"H", tier:"ery",     cat:"Downstream",  note:"B→H. Ery-mediated — B & H keduanya terminal (§3.3). Tanpa return signal. Node baru v1.7."}
+];
+
+const KIND_LABEL = {router:"Router — inisiasi otonom", bilateral:"Bilateral-only emitter", terminal:"Terminal", meta:"Meta · non-routing"};
+const TIER_LABEL = {auto:"Otonom", ery:"Ery-mediated", generic:"Reception generik", pre:"Pre-established", undef:"Belum terimplementasi"};
+const TIER_TAG   = {auto:"auto", ery:"ery", generic:"generic", pre:"pre", undef:"generic"};
+
+// ============ LAYOUT ============
+// Concentric placement: routers inner ring, bilateral mid, terminals outer arc, meta detached.
+const CX=430, CY=380;
+const POS = {
+  // routers — upstream, left-center
+  A:{x:300,y:250},
+  D:{x:300,y:510},
+  // bilateral emitters — flank A
+  E:{x:470,y:150},
+  H:{x:540,y:300},
+  // terminals — right / outer
+  B:{x:560,y:470},
+  K:{x:700,y:520},
+  C:{x:150,y:390},
+  F:{x:150,y:600},
+  J:{x:470,y:640},
+  G:{x:150,y:180},
+  I:{x:680,y:210},
+  // meta — detached lower-right
+  L:{x:770,y:660}
+};
+const ERY = {x:410, y:380}; // central hub
+
+const R = 34;              // node radius
+const KIND_COLOR = {router:"var(--router)", bilateral:"var(--bilateral)", terminal:"var(--terminal)", meta:"var(--meta)"};
+
+const svg = document.getElementById('graph');
+const gEdges = document.getElementById('edges');
+const gNodes = document.getElementById('nodes');
+const SVGNS = "http://www.w3.org/2000/svg";
+
+function el(tag, attrs){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+
+// resolve endpoint: real node or the Ery hub (for ANY)
+function endpoint(id){ return id==="__ANY__" ? ERY : POS[id]; }
+
+// draw Ery hub
+(function drawEry(){
+  const g=el('g',{class:'ery-hub'});
+  g.appendChild(el('circle',{cx:ERY.x,cy:ERY.y,r:26}));
+  const t=el('text',{x:ERY.x,y:ERY.y}); t.textContent="Ery"; g.appendChild(t);
+  gNodes.appendChild(g);
+})();
+
+// ---- edges ----
+const edgeEls = [];
+EDGES.forEach(e=>{
+  const a=endpoint(e.from), b=endpoint(e.to);
+  if(!a||!b) return;
+  // trim endpoints to node radius
+  const ax=a.x, ay=a.y, bx=b.x, by=b.y;
+  const dx=bx-ax, dy=by-ay, len=Math.hypot(dx,dy)||1;
+  const ux=dx/len, uy=dy/len;
+  const rA = (e.from==="__ANY__")?26:R;
+  const rB = (e.to==="__ANY__")?26:R;
+  const x1=ax+ux*rA, y1=ay+uy*rA, x2=bx-ux*rB, y2=by-uy*rB;
+  // gentle curve (perpendicular offset)
+  const mx=(x1+x2)/2, my=(y1+y2)/2;
+  const off = e.bidir?0:26;
+  const cxp=mx - uy*off, cyp=my + ux*off;
+  const d=`M${x1.toFixed(1)},${y1.toFixed(1)} Q${cxp.toFixed(1)},${cyp.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`;
+
+  const color = e.tier==="auto"?"var(--edge-auto)": e.tier==="ery"?"var(--edge-ery)":"var(--edge-generic)";
+  const dash  = (e.tier==="auto")?"none":(e.tier==="pre"?"1 6":"5 5");
+  const mk = e.tier==="auto"?"url(#arrow-auto)": e.tier==="ery"?"url(#arrow-ery)":"url(#arrow-generic)";
+  const opacity = e.tier==="undef"?0.28:0.7;
+
+  const path=el('path',{class:'edge',d,stroke:color,'stroke-width':1.8,'stroke-dasharray':dash,'marker-end':mk,opacity});
+  if(e.bidir) path.setAttribute('marker-start', mk);
+  const hit =el('path',{class:'edge-hit',d});
+  hit.addEventListener('click',(ev)=>{ev.stopPropagation();selectEdge(e);});
+  hit.addEventListener('mouseenter',()=>focusEdge(e));
+  hit.addEventListener('mouseleave',clearFocus);
+  gEdges.appendChild(path); gEdges.appendChild(hit);
+  edgeEls.push({e,path});
+});
+
+// ---- nodes ----
+const nodeEls = {};
+Object.keys(AGENTS).forEach(id=>{
+  const a=AGENTS[id], p=POS[id];
+  const g=el('g',{class:'node',tabindex:0,'data-id':id,role:'button','aria-label':`Agen ${id} — ${a.name}`});
+  const body=el('circle',{class:'node-body',cx:p.x,cy:p.y,r:R,fill:KIND_COLOR[a.kind],stroke:'#0e1418','stroke-width':2});
+  const letter=el('text',{class:'letter','font-size':'22px',x:p.x,y:p.y}); letter.textContent=id;
+  const label=el('text',{class:'label',x:p.x,y:p.y+R+16}); label.textContent=a.name;
+  const dom=el('text',{class:'domain',x:p.x,y:p.y+R+31}); dom.textContent=a.domain;
+  g.append(body,letter,label,dom);
+  g.addEventListener('click',(ev)=>{ev.stopPropagation();selectNode(id);});
+  g.addEventListener('mouseenter',()=>focusNode(id));
+  g.addEventListener('mouseleave',clearFocus);
+  g.addEventListener('keydown',(ev)=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();selectNode(id);}});
+  gNodes.appendChild(g);
+  nodeEls[id]=g;
+});
+
+svg.addEventListener('click',()=>{clearSelection();});
+
+// ============ INTERACTION ============
+const sideEyebrow=document.getElementById('side-eyebrow');
+const sideTitle=document.getElementById('side-title');
+const sideBody=document.getElementById('side-body');
+let activeFilters=new Set();
+
+function edgesTouching(id){
+  return EDGES.filter(e=>e.from===id||e.to===id);
+}
+function neighborsOf(id){
+  const s=new Set();
+  edgesTouching(id).forEach(e=>{ if(e.from!=="__ANY__")s.add(e.from); if(e.to!=="__ANY__")s.add(e.to); });
+  return s;
+}
+
+function focusNode(id){
+  const nb=neighborsOf(id); nb.add(id);
+  Object.keys(nodeEls).forEach(k=>nodeEls[k].classList.toggle('dim',!nb.has(k)));
+  edgeEls.forEach(({e,path})=>{
+    const touch=(e.from===id||e.to===id||(id==="I"&&(e.from==="__ANY__"||e.to==="__ANY__")));
+    path.classList.toggle('dim',!touch);
+    path.classList.toggle('hot',touch);
+  });
+}
+function focusEdge(e){
+  const set=new Set([e.from,e.to]);
+  Object.keys(nodeEls).forEach(k=>nodeEls[k].classList.toggle('dim',!set.has(k)));
+  edgeEls.forEach(({e:ee,path})=>{const on=ee.id===e.id;path.classList.toggle('dim',!on);path.classList.toggle('hot',on);});
+}
+function clearFocus(){
+  if(document.querySelector('.node.hot')) return; // keep if a selection is pinned
+  applyFilterDim();
+  edgeEls.forEach(({path})=>{path.classList.remove('dim');path.classList.remove('hot');});
+}
+
+function clearSelection(){
+  Object.keys(nodeEls).forEach(k=>nodeEls[k].classList.remove('hot'));
+  applyFilterDim();
+  edgeEls.forEach(({path})=>{path.classList.remove('dim');path.classList.remove('hot');});
+  sideEyebrow.textContent="Pilih node";
+  sideTitle.textContent="Ekosistem 12 agen";
+  sideBody.innerHTML=`<p class="placeholder">Klik sebuah <strong>agen</strong> untuk domain, peran, dan edge-nya. Klik sebuah <strong>garis edge</strong> untuk detail status routing.<br><br>Seluruh transfer manual via Ery (<span style="font-family:var(--mono);color:var(--ink-dim)">§2.1</span>); hub pusat = Ery, otoritas final (<span style="font-family:var(--mono);color:var(--ink-dim)">§2.5</span>).</p>`;
+}
+
+function selectNode(id){
+  switchTab('detail');
+  Object.keys(nodeEls).forEach(k=>nodeEls[k].classList.remove('hot'));
+  nodeEls[id].classList.add('hot');
+  focusNode(id);
+  const a=AGENTS[id];
+  const incoming=EDGES.filter(e=>e.to===id);
+  const outgoing=EDGES.filter(e=>e.from===id);
+  sideEyebrow.textContent=`Agen ${id} · ${a.domain}`;
+  sideTitle.textContent=a.name;
+  const pillSub = a.sub?`<span class="pill k-${a.kind}">${a.sub}</span>`:"";
+  let html=`<span class="pill k-${a.kind}">${KIND_LABEL[a.kind]}</span>${pillSub}`;
+  html+=`<div class="field"><div class="f-lbl">Peran</div><div class="f-val">${a.desc}</div></div>`;
+  html+=`<div class="field"><div class="f-lbl">Emisi otonom</div><div class="f-val" style="font-family:var(--mono);font-size:12px">${a.emits}</div></div>`;
+  html+=edgeBlock("Edge masuk", incoming, id);
+  html+=edgeBlock("Edge keluar", outgoing, id);
+  sideBody.innerHTML=html;
+  wireSideEdges();
+}
+
+function edgeBlock(title, list, selfId){
+  if(!list.length) return `<div class="field"><div class="f-lbl">${title}</div><div class="f-val" style="color:var(--ink-faint)">— tidak ada —</div></div>`;
+  let s=`<div class="field"><div class="f-lbl">${title}</div><ul class="edge-list">`;
+  list.forEach(e=>{
+    const other = (e.from===selfId? e.to : e.from);
+    const oname = other==="__ANY__"?"ANY":other;
+    const dir = e.from===selfId?"→":"←";
+    s+=`<li data-eid="${e.id}" style="cursor:pointer"><span class="eid">${e.id}</span><span>${dir} ${oname}</span><span class="etag ${TIER_TAG[e.tier]}">${TIER_LABEL[e.tier]}</span></li>`;
+  });
+  s+=`</ul></div>`;
+  return s;
+}
+function wireSideEdges(){
+  sideBody.querySelectorAll('li[data-eid]').forEach(li=>{
+    li.addEventListener('click',()=>{const e=EDGES.find(x=>x.id===li.dataset.eid);if(e)selectEdge(e);});
+  });
+}
+
+function selectEdge(e){
+  switchTab('detail');
+  Object.keys(nodeEls).forEach(k=>nodeEls[k].classList.remove('hot'));
+  [e.from,e.to].forEach(k=>{if(nodeEls[k])nodeEls[k].classList.add('hot');});
+  focusEdge(e);
+  const fromN = e.from==="__ANY__"?"Semua agen":`${e.from} — ${AGENTS[e.from]?.name||""}`;
+  const toN   = e.to==="__ANY__"?"Semua agen":`${e.to} — ${AGENTS[e.to]?.name||""}`;
+  sideEyebrow.textContent=`Edge · ${e.cat}`;
+  sideTitle.textContent=`${e.id} · ${e.from==="__ANY__"?"ANY":e.from} ${e.bidir?"↔":"→"} ${e.to==="__ANY__"?"ANY":e.to}`;
+  let html=`<span class="pill k-${e.tier==='auto'?'bilateral':(e.tier==='ery'?'terminal':'terminal')}" style="background:${e.tier==='auto'?'rgba(75,179,167,0.16)':e.tier==='ery'?'rgba(201,111,90,0.16)':'rgba(95,114,125,0.18)'};color:${e.tier==='auto'?'var(--bilateral)':e.tier==='ery'?'var(--edge-ery)':'var(--ink-dim)'};border-color:transparent">${TIER_LABEL[e.tier]}</span>`;
+  html+=`<div class="field"><div class="f-lbl">Asal</div><div class="f-val">${fromN}</div></div>`;
+  html+=`<div class="field"><div class="f-lbl">Tujuan</div><div class="f-val">${toN}</div></div>`;
+  html+=`<div class="field"><div class="f-lbl">Kategori</div><div class="f-val">${e.cat}</div></div>`;
+  html+=`<div class="field"><div class="f-lbl">Status</div><div class="f-val">${e.note}</div></div>`;
+  sideBody.innerHTML=html;
+}
+
+// ============ TASK ROUTER (Opsi A — keyword, deterministik) ============
+// Lexicon: kata kunci per agen (dari domain + proyek nyata Ery). Bobot: istilah spesifik > umum.
+const LEXICON = {
+  A:{strong:["manuskrip","paper","jurnal","kti","orasi ilmiah","publikasi ilmiah","artikel ilmiah","academic","riset akademis","naskah akademik","abstrak"],
+     weak:["riset","penelitian","kajian","studi","literatur","sitasi","referensi"]},
+  B:{strong:["esai populer","sains populer","science communication","komunikasi sains","medium","artikel populer","tulisan populer"],
+     weak:["esai","geosains","kutai","cekungan","populer","publik","awam"]},
+  C:{strong:["materi kuliah","bahan ajar","modul","pelatihan asn","rpp","silabus","obe","kurikulum","pedagogi","mahasiswa","widyaiswara","bpsdm"],
+     weak:["ajar","mengajar","kuliah","diklat","latsar","kelas","jenjang","asesmen belajar"]},
+  D:{strong:["ekstraksi pengetahuan","dialog intelektual","brainstorm","curah gagasan","sintesis ide","kerangka berpikir","eksplorasi konsep"],
+     weak:["gagasan","ide","konsep","pikirkan","memikirkan","renungkan","eksplorasi","diskusi"]},
+  E:{strong:["startup","model bisnis","business model","strategi bisnis","monetisasi","produk","go-to-market","tam","sam","som","basis data stratigrafi","konsultan","retainer","pricing"],
+     weak:["bisnis","usaha","pasar","pelanggan","klien","komersial","jasa","pendapatan"]},
+  F:{strong:["cerpen","puisi","fiksi","memoar","naskah kreatif","penulisan kreatif","creative writing","esai reflektif","esai merdeka","prosa"],
+     weak:["cerita","kreatif","narasi","reflektif","personal","craft","gaya bahasa"]},
+  G:{strong:["al-qur'an","alquran","quran","tafsir","hadis","fikih","islam","keislaman","syariah","ulama","mazhab","dakwah","kajian islam"],
+     weak:["agama","spiritual","religius","ayat","surah"]},
+  H:{strong:["surat dinas","korespondensi","surat resmi","surat permohonan","mutasi","pembebasan ikatan dinas","upn","nota dinas","memo resmi","surat formal","balasan surat"],
+     weak:["surat","dinas","formal","permohonan","komunikasi profesional","email resmi","undangan"]},
+  I:{strong:["evaluasi dokumen","asesmen","penilaian","koherensi","pkp-25","review dokumen","menilai kualitas","evaluasi karya","rubrik"],
+     weak:["evaluasi","menilai","penilai","kualitas","koreksi","tinjau","assess"]},
+  J:{strong:["statistik","analisis data","regresi","korelasi","uji hipotesis","data kuantitatif","anova","deskriptif","biaya hidup","spss","dataset"],
+     weak:["data","angka","hitung","kuantitatif","grafik","tren","metrik","numerik"]},
+  K:{strong:["media sosial","medsos","instagram","carousel","konten platform","postingan","caption","infografis","twitter","x post","reels","tiktok"],
+     weak:["konten","posting","platform","sosmed","visual","unggahan"]},
+  L:{strong:["coaching","mentoring","karier","career","refleksi diri","pengembangan diri","keputusan karier","arah karier","konsultasi pribadi"],
+     weak:["nasihat","bimbingan","pertimbangan","dilema","pilihan hidup"]}
 };
 
-/* ── TOOLTIP ── */
-const tip=document.getElementById('tip'),tit=document.getElementById('tit'),tib=document.getElementById('tib');
-document.addEventListener('mousemove',e=>{if(tip.style.display!=='none')pos(e.clientX,e.clientY);});
-function pos(cx,cy){
-  const tw=324,th=tip.offsetHeight||160;
-  let x=cx+16,y=cy+14;
-  if(x+tw>window.innerWidth-12){x=cx-tw-12;if(x<8)x=8;}
-  if(y+th>window.innerHeight-12)y=cy-th-8;
-  if(y<8)y=8;
-  tip.style.left=x+'px';tip.style.top=y+'px';
+// Rantai hilir tipikal per agen primer (mengacu Edge Registry §3.2 / Content Pipeline).
+// tier: auto|ery|generic — status routing dari registry.
+const CHAINS = {
+  A:[{to:"B",eid:"E-15",tier:"auto",label:"→ esai populer"},
+     {to:"K",eid:"E-17",tier:"generic",label:"→ konten platform"},
+     {to:"J",eid:"E-08",tier:"auto",label:"→ analisis data"},
+     {to:"H",eid:"E-10",tier:"pre",label:"↔ korespondensi (SC-01)"}],
+  D:[{to:"A",eid:"E-01",tier:"undef",label:"→ manuskrip"},
+     {to:"B",eid:"E-02",tier:"generic",label:"→ esai populer"},
+     {to:"C",eid:"E-03",tier:"auto",label:"→ materi ajar"},
+     {to:"J",eid:"E-06",tier:"auto",label:"→ analisis data"},
+     {to:"K",eid:"E-18",tier:"generic",label:"→ konten platform"}],
+  B:[{to:"K",eid:"E-16",tier:"ery",label:"→ konten platform"},
+     {to:"H",eid:"E-19",tier:"ery",label:"→ korespondensi"}],
+  E:[{to:"A",eid:"E-11",tier:"pre",label:"↔ riset pasar (BM-03)"}],
+  I:[{to:"__ANY__",eid:"E-13",tier:"ery",label:"→ hasil evaluasi ke agen peminta"}]
+};
+
+const KIND_HEX={router:"#e0a13c",bilateral:"#4bb3a7",terminal:"#6f8aa8",meta:"#a77bb8"};
+const ROLE_TAG_STYLE={
+  router:'background:rgba(224,161,60,0.16);color:var(--router)',
+  bilateral:'background:rgba(75,179,167,0.16);color:var(--bilateral)',
+  terminal:'background:rgba(111,138,168,0.16);color:var(--terminal)',
+  meta:'background:rgba(167,123,184,0.16);color:var(--meta)'
+};
+const CHAIN_ARROW_CLASS={auto:"auto",ery:"ery",generic:"generic",pre:"generic",undef:"generic"};
+
+const EXAMPLES=[
+  "Menyusun surat pembebasan ikatan dinas ke UPN Yogyakarta",
+  "Menulis esai populer tentang Cekungan Kutai untuk Medium",
+  "Menganalisis data biaya hidup Samarinda secara statistik",
+  "Membuat modul pelatihan ASN berbasis OBE",
+  "Mengevaluasi koherensi karya peserta PKP-25",
+  "Bikin carousel Instagram soal geologi",
+  "Brainstorm kerangka model bisnis basis data stratigrafi"
+];
+
+function normalize(s){return s.toLowerCase().replace(/[^\p{L}\p{N}\s'-]/gu," ");}
+
+function routeTask(text){
+  const t=" "+normalize(text)+" ";
+  const scores={}; const hits={};
+  Object.keys(LEXICON).forEach(id=>{
+    let sc=0; const found=[];
+    LEXICON[id].strong.forEach(k=>{ if(t.includes(" "+k+" ")||t.includes(" "+k)){sc+=3;found.push(k);} });
+    LEXICON[id].weak.forEach(k=>{ if(t.includes(" "+k+" ")||t.includes(" "+k)){sc+=1;found.push(k);} });
+    if(sc>0){scores[id]=sc;hits[id]=found;}
+  });
+  const ranked=Object.keys(scores).sort((a,b)=>scores[b]-scores[a]);
+  return {ranked,scores,hits};
 }
-function show(e,t,b){tit.textContent=t;tib.innerHTML=b;tip.style.display='block';pos(e.clientX,e.clientY);}
-function hide(){tip.style.display='none';}
-document.querySelectorAll('.ah').forEach(el=>{
-  el.addEventListener('mouseenter',e=>{const d=ARR[el.dataset.aid];if(d)show(e,d.t,d.b);});
-  el.addEventListener('mouseleave',hide);
+
+function highlightPath(ids){
+  const set=new Set(ids);
+  Object.keys(nodeEls).forEach(k=>{nodeEls[k].classList.toggle('dim',!set.has(k));nodeEls[k].classList.toggle('hot',set.has(k));});
+  edgeEls.forEach(({e,path})=>{
+    const on = set.has(e.from)&&set.has(e.to);
+    const anyOn = set.has("I")&&(e.from==="__ANY__"||e.to==="__ANY__")&&(set.has(e.from==="__ANY__"?e.to:e.from));
+    const active=on||anyOn;
+    path.classList.toggle('hot',active);
+    path.classList.toggle('dim',!active);
+  });
+}
+
+function renderResults(res){
+  const box=document.getElementById('route-results');
+  if(!res.ranked.length){
+    box.innerHTML=`<div class="result-head">Hasil</div><div class="no-match">Tidak ada domain agen yang cocok dengan kata-kata itu. Coba lebih spesifik — sebut jenis keluaran (surat, esai, modul, analisis data, konten media sosial) atau topiknya. Lihat contoh di atas.</div>`;
+    clearSelection();
+    return;
+  }
+  const primary=res.ranked[0];
+  const secondary=res.ranked.slice(1,3); // maksimal dua agen sekunder
+  const pa=AGENTS[primary];
+  let html=`<div class="result-head">Agen primer</div>`;
+  html+=recCard(primary,res.hits[primary],true);
+
+  // rantai hilir dari agen primer
+  const chain=CHAINS[primary]||[];
+  if(chain.length){
+    html+=`<div class="result-head">Rantai hilir tipikal</div><div class="chain">`;
+    html+=`<div class="chain-step"><span class="rec-order">${primary}</span><strong style="color:var(--ink)">${pa.name}</strong></div>`;
+    chain.forEach(c=>{
+      const dest=c.to==="__ANY__"?"Agen peminta":`${c.to} · ${AGENTS[c.to].name}`;
+      html+=`<div class="chain-step"><span class="chain-arrow ${CHAIN_ARROW_CLASS[c.tier]}">${c.label.startsWith("↔")?"↔":"→"}</span><span>${dest}</span><span class="chain-note">${c.eid} · ${TIER_LABEL[c.tier]}</span></div>`;
+    });
+    html+=`</div>`;
+  }
+
+  if(secondary.length){
+    html+=`<div class="result-head">Kemungkinan juga relevan</div>`;
+    secondary.forEach(id=>{ html+=recCard(id,res.hits[id],false); });
+  }
+  box.innerHTML=html;
+
+  // sorot jalur di peta: primer + tujuan hilir + agen sekunder
+  const pathIds=[primary,...chain.map(c=>c.to).filter(x=>x!=="__ANY__"),...secondary];
+  highlightPath(pathIds);
+
+  // klik kartu → buka detail node
+  box.querySelectorAll('[data-goid]').forEach(el=>{
+    el.addEventListener('click',()=>{switchTab('detail');selectNode(el.dataset.goid);});
+  });
+}
+
+function recCard(id,found,isPrimary){
+  const a=AGENTS[id];
+  const why = (found&&found.length)
+     ? `Kata kunci cocok: `+found.slice(0,5).map(w=>`<span class="hit">${w}</span>`).join(", ")
+     : "";
+  return `<div class="rec-card ${isPrimary?'primary':''}" data-goid="${id}" style="cursor:pointer">
+    <div class="rec-top">
+      <span class="rec-badge" style="background:${KIND_HEX[a.kind]}">${id}</span>
+      <div><div class="rec-name">${a.name}</div><div class="rec-dom">${a.domain}</div></div>
+      <span class="rec-role" style="${ROLE_TAG_STYLE[a.kind]}">${a.kind}</span>
+    </div>
+    <div class="rec-why">${a.desc}${why?`<br>${why}`:""}</div>
+  </div>`;
+}
+
+// wire router UI
+const taskInput=document.getElementById('task-input');
+document.getElementById('route-btn').addEventListener('click',()=>{ if(taskInput.value.trim()) renderResults(routeTask(taskInput.value)); });
+document.getElementById('clear-btn').addEventListener('click',()=>{
+  taskInput.value=""; document.getElementById('route-results').innerHTML=""; clearSelection();
 });
-document.querySelectorAll('.nd').forEach(el=>{
-  el.addEventListener('mouseenter',e=>{const d=ND[el.dataset.nid];if(d)show(e,d.t,d.b);});
-  el.addEventListener('mouseleave',hide);
+taskInput.addEventListener('keydown',(ev)=>{ if((ev.ctrlKey||ev.metaKey)&&ev.key==='Enter'){ if(taskInput.value.trim()) renderResults(routeTask(taskInput.value)); } });
+(function buildExamples(){
+  const wrap=document.getElementById('ex-chips');
+  EXAMPLES.forEach(x=>{
+    const c=document.createElement('span'); c.className='ex-chip'; c.textContent=x;
+    c.addEventListener('click',()=>{taskInput.value=x;renderResults(routeTask(x));});
+    wrap.appendChild(c);
+  });
+})();
+
+// ============ TABS ============
+const panels={router:document.getElementById('panel-router'),detail:document.getElementById('panel-detail')};
+const tabEls={router:document.getElementById('tab-router'),detail:document.getElementById('tab-detail')};
+function switchTab(which){
+  Object.keys(panels).forEach(k=>{panels[k].hidden=(k!==which);tabEls[k].setAttribute('aria-selected',(k===which).toString());});
+}
+tabEls.router.addEventListener('click',()=>switchTab('router'));
+tabEls.detail.addEventListener('click',()=>switchTab('detail'));
+Object.values(tabEls).forEach(t=>t.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();t.click();}}));
+
+// ============ FILTERS ============
+document.querySelectorAll('#filters .chip').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    const k=chip.dataset.k;
+    const on=chip.getAttribute('aria-pressed')==='true';
+    chip.setAttribute('aria-pressed',(!on).toString());
+    if(on)activeFilters.delete(k); else activeFilters.add(k);
+    applyFilterDim();
+  });
 });
-
-/* ── HIGHLIGHT ── */
-const AC={A:'#378ADD',B:'#7F77DD',C:'#1D9E75',D:'#888780',E:'#BA7517',F:'#D85A30',G:'#639922',H:'#D4537E',I:'#A32D2D',J:'#3B5EA6'};
-const AF={A:'#E6F1FB',B:'#EEEDFE',C:'#E1F5EE',D:'#F1EFE8',E:'#FAEEDA',F:'#FAECE7',G:'#EAF3DE',H:'#FBEAF0',I:'#FCEBEB',J:'#E8EEF8'};
-const AN={A:'Agent A · L2a',B:'Agent B · L2c',C:'Agent C · L2b',D:'Agent D · L2d',E:'Agent E · L2f',F:'Agent F · L2g',G:'Agent G · L2h',H:'Agent H · L2e',I:'Agent I · Evaluator',J:'Agent J · L2j'};
-
-function reset(){
-  ['A','B','C','D','E','F','G','H','I','J'].forEach(id=>{
-    const g=document.getElementById('nd-'+id);if(!g)return;
-    const r=g.querySelector('rect');r.setAttribute('stroke-width','0.5');r.style.filter='';
+function applyFilterDim(){
+  if(document.querySelector('.node.hot'))return; // don't override an active selection
+  if(activeFilters.size===0){Object.keys(nodeEls).forEach(k=>nodeEls[k].classList.remove('dim'));return;}
+  Object.keys(nodeEls).forEach(k=>{
+    nodeEls[k].classList.toggle('dim',!activeFilters.has(AGENTS[k].kind));
   });
 }
-function hl(p,s){
-  reset();
-  p.forEach(id=>{
-    const uid=id.toUpperCase(),g=document.getElementById('nd-'+uid);if(!g)return;
-    const r=g.querySelector('rect');r.setAttribute('stroke-width','4');
-    r.style.filter='drop-shadow(0 0 10px '+AC[uid]+'CC)';
-  });
-  s.forEach(id=>{
-    const uid=id.toUpperCase(),g=document.getElementById('nd-'+uid);if(!g)return;
-    const r=g.querySelector('rect');r.setAttribute('stroke-width','2.5');
-    r.style.filter='drop-shadow(0 0 5px '+AC[uid]+'77)';
-  });
-}
-
-/* ── RULE-BASED ROUTING ── */
-function route(text){
-  const t=text.toLowerCase();
-  const sc={A:0,B:0,C:0,D:0,E:0,F:0,G:0,H:0,I:0,J:0};
-  const P={
-    D:[[4,['saya sedang memikirkan','sedang mengeksplorasi','eksplorasi ide']],[3,['bagaimana jika','what if','apa yang dimaksud','analisis mendalam']],[2,['memikirkan','mempertimbangkan','mengeksplorasi','mendalami','pikiran awal']],[1,['bagaimana','mengapa','kenapa','apa itu','jelaskan','think','explore','insight','gagasan']]],
-    A:[[5,['review article','literature review','scientific paper','paper ilmiah','jurnal ilmiah','manuskrip ilmiah','imrad','systematic review']],[3,['paper','jurnal','riset akademik','penelitian ilmiah','monograf','manuscript']],[2,['sitasi','citation','referensi','meta-analisis','bibliografi']],[1,['akademik','ilmiah','scholarly','research','publikasi']]],
-    B:[[5,['instagram','twitter','linkedin','youtube','tiktok','facebook','medium.com','threads','mastodon']],[4,['konten medsos','social media','science communication','sains populer','popularisasi']],[3,['konten platform','artikel populer','infografis','carousel','thread media']],[2,['konten','content','engagement','audiens publik','viral']],[1,['posting','caption','hashtag','reel','story']]],
-    C:[[5,['rps','rencana pembelajaran semester','silabus mata kuliah','lesson plan']],[4,['bahan ajar','materi kuliah','kurikulum','curriculum design']],[3,['mengajar','pembelajaran','mata kuliah','perkuliahan','course design','learning outcome']],[2,['mahasiswa','dosen','perguruan tinggi','assessment','ujian','bloom']],[1,['pedagogik','sarjana','magister','doktoral','sni dikti']]],
-    E:[[5,['pitch deck','investor pitch','business plan','startup pitch']],[4,['startup','model bisnis','business model','bmc','okr','kpi']],[3,['bisnis','strategi bisnis','pendanaan','revenue model','sop']],[2,['pasar','market','produk','monetisasi','profit','roadmap']],[1,['usaha','wirausaha','entrepreneur','modal','investasi']]],
-    F:[[5,['esai personal','personal essay','refleksi spiritual','spiritual reflective','memoar','memoir']],[4,['menulis kreatif','creative writing','fiksi','fiction','prosa liris']],[3,['puisi','poetry','cerpen','short story','narasi personal','autobiografi']],[2,['menulis','writing','cerita','karakter','plot','voice']],[1,['sastra','literasi','penulis','author','kreatif']]],
-    G:[[5,['tafsir quran','kajian quran','quranic studies','ulum al-quran']],[4,["qur'an",'quran','al-quran','surah','surat al-','ayat','tafsir','kajian islam','islamic studies']],[3,['hadis','hadith','sunnah','fiqh','aqidah','ulama','kitab tafsir']],[2,['islam','islamic','nabi','rasul','dakwah','ibadah','doa']],[1,['al-','ramadan','sholat','zakat','haji','iman','takwa']]],
-    H:[[5,['response to reviewer','response to reviewers','rebuttal','cover letter jurnal']],[4,['surat resmi','formal letter','laporan resmi','email formal','korespondensi resmi']],[3,['laporan','surat','korespondensi','correspondence','rekomendasi']],[2,['email','proposal resmi','mou','perjanjian','undangan resmi']],[1,['formal','resmi','administratif','institusional']]],
-    I:[[5,['evaluasi dokumen','document evaluation','cross-domain eval','penilaian dokumen','review kualitas']],[3,['evaluasi kualitas','quality check','validasi dokumen','assess dokumen','feedback dokumen']],[2,['evaluasi','evaluation','kualitas konten','cek kualitas']],[1,['eval','review','periksa','cek']]],
-    J:[[5,['analisis statistik','statistical analysis','past v4','multivariate','pca','cluster analysis','analisis geosains']],[4,['statistik','statistics','data analysis','analisis data','uji hipotesis','regresi','regression','anova']],[3,['distribusi','distribution','korelasi','correlation','variance','chi square','uji']],[2,['data numerik','kuantitatif','quantitative','sampling','outlier','dataset']],[1,['angka data','nilai statistik','frekuensi','frequency','visualisasi data']]]
-  };
-  Object.entries(P).forEach(([ag,tiers])=>{
-    tiers.forEach(([w,kws])=>{kws.forEach(kw=>{if(t.includes(kw))sc[ag]+=w;});});
-  });
-  const fp=/\b(saya|aku|sy)\b/.test(t);
-  const it=/\b(ingin|mau|akan|hendak|sedang)\b/.test(t);
-  if(fp&&it)sc.D+=1.5;
-  if(Object.values(sc).reduce((a,b)=>a+b,0)<2)sc.D+=3;
-  const sorted=Object.entries(sc).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
-  if(!sorted.length)return{primary:['D'],secondary:[],reasoning:'Input belum spesifik. Agent D dapat membantu mengeksplorasi dan memetakan pikiran Ery sebelum diarahkan ke agent eksekusi yang tepat.'};
-  const mx=sorted[0][1],thr=mx*0.55;
-  const primary=sorted.filter(([,v])=>v>=thr).slice(0,3).map(([k])=>k);
-  const secondary=sorted.filter(([,v])=>v>0&&v<thr).slice(0,2).map(([k])=>k);
-  const D2={A:'penulisan akademik (A · L2a)',B:'komunikasi sains & platform (B · L2c)',C:'desain pembelajaran (C · L2b)',D:'eksplorasi & dialog (D · L2d)',E:'startup & strategi bisnis (E · L2f)',F:'penulisan kreatif & esai (F · L2g)',G:"kajian Islam & Qur'an (G · L2h)",H:'komunikasi profesional formal (H · L2e)',I:'evaluasi dokumen lintas-domain (I)',J:'analisis statistik (J · L2j)'};
-  let r=`Input Ery paling relevan dengan ${primary.map(id=>D2[id]).join(', ')}.`;
-  if(secondary.length)r+=` Agen pendukung: ${secondary.map(id=>D2[id]).join(', ')}.`;
-  return{primary,secondary,reasoning:r};
-}
-
-/* ── DISPLAY ── */
-function disp(res){
-  document.getElementById('rr').textContent=res.reasoning;
-  const ra=document.getElementById('ra');ra.innerHTML='';
-  res.primary.forEach(id=>{
-    const uid=id.toUpperCase(),b=document.createElement('span');
-    b.className='ab';b.style.cssText='border-color:'+AC[uid]+';color:'+AC[uid]+';background:'+AF[uid];
-    b.textContent=AN[uid]||'Agent '+uid;ra.appendChild(b);
-  });
-  res.secondary.forEach(id=>{
-    const uid=id.toUpperCase(),b=document.createElement('span');
-    b.className='ab s';b.style.cssText='border-color:'+AC[uid]+';color:'+AC[uid]+';background:transparent';
-    b.textContent=(AN[uid]||'Agent '+uid)+' (pendukung)';ra.appendChild(b);
-  });
-  document.getElementById('rp').style.display='block';
-}
-
-/* ── INPUT ── */
-let dt=null;
-document.getElementById('ci').addEventListener('input',e=>{
-  clearTimeout(dt);
-  const v=e.target.value.trim();
-  if(v.length<6){reset();document.getElementById('rp').style.display='none';return;}
-  dt=setTimeout(()=>{const r=route(v);hl(r.primary,r.secondary);disp(r);},600);
-});
-function doA(){
-  clearTimeout(dt);
-  const v=document.getElementById('ci').value.trim();if(!v)return;
-  const r=route(v);hl(r.primary,r.secondary);disp(r);
-}
-document.getElementById('ci').addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();doA();}
-});
 </script>
 </body>
 </html>
