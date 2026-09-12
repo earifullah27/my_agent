@@ -6,22 +6,23 @@
 <title>Peta Ekosistem Agen — Ery Arifullah</title>
 <style>
   :root{
-    --bg:#0e1418;
-    --panel:#151d23;
-    --panel-2:#1b262e;
-    --line:#2b3a44;
-    --line-soft:#223038;
-    --ink:#e6edf1;
-    --ink-dim:#8fa2ad;
-    --ink-faint:#5f727d;
-    --router:#e0a13c;      /* amber — routers */
-    --bilateral:#4bb3a7;   /* teal — bilateral-only emitters */
-    --terminal:#6f8aa8;    /* slate blue — terminal */
-    --meta:#a77bb8;        /* violet — meta / non-routing */
-    --edge-auto:#4bb3a7;   /* autonomous edge */
-    --edge-ery:#c96f5a;    /* Ery-mediated edge */
-    --edge-generic:#5f727d;/* generic/undefined reception */
-    --focus:#f2c14e;
+    --bg:#eef1f4;          /* light app background */
+    --stage:#f6f8fa;       /* map canvas — brightest */
+    --panel:#ffffff;       /* sidebar */
+    --panel-2:#eef2f6;      /* insets */
+    --line:#c4cfd8;
+    --line-soft:#dbe2e8;
+    --ink:#1a2830;         /* primary text — dark */
+    --ink-dim:#4a5c68;
+    --ink-faint:#7c8c97;
+    --router:#c67f16;      /* amber — routers (darkened for light bg) */
+    --bilateral:#1f8d80;   /* teal — bilateral-only emitters */
+    --terminal:#4a6a8c;    /* slate blue — terminal */
+    --meta:#8a52a0;        /* violet — meta / non-routing */
+    --edge-auto:#178476;   /* autonomous edge */
+    --edge-ery:#c05437;    /* Ery-mediated edge */
+    --edge-generic:#7c8c97;/* generic/undefined reception */
+    --focus:#d98a13;       /* selection accent */
     --mono:"SFMono-Regular",ui-monospace,"Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
     --sans:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
   }
@@ -76,7 +77,7 @@
 
   /* ---------- Layout ---------- */
   .wrap{display:flex;min-height:calc(100vh - 92px)}
-  .stage{flex:1;position:relative;min-width:0}
+  .stage{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--stage)}
   .side{
     width:360px;
     flex:0 0 360px;
@@ -89,30 +90,24 @@
     top:0;
   }
 
-  svg{display:block;width:100%;height:100%;min-height:560px}
+  svg{display:block;width:100%;flex:1;min-height:420px}
 
-  /* ---------- Controls ---------- */
-  .controls{
-    position:absolute;
-    top:16px;left:16px;
-    z-index:5;
+  /* ---------- Legend bar (below map, never overlaps nodes) ---------- */
+  .legendbar{
     display:flex;
-    flex-direction:column;
-    gap:10px;
-    max-width:250px;
+    flex-wrap:wrap;
+    gap:14px 28px;
+    padding:14px 20px;
+    border-top:1px solid var(--line);
+    background:var(--bg);
   }
-  .legend{
-    background:rgba(21,29,35,0.92);
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:12px 13px;
-    backdrop-filter:blur(4px);
-  }
+  .legend{min-width:0}
   .legend h3{
     font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;
-    color:var(--ink-faint);margin:0 0 9px;font-weight:600;
+    color:var(--ink-faint);margin:0 0 8px;font-weight:600;
   }
-  .legend .row{display:flex;align-items:center;gap:9px;font-size:12px;margin:6px 0;color:var(--ink-dim)}
+  .legend-rows{display:flex;flex-wrap:wrap;gap:5px 18px}
+  .legend .row{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-dim)}
   .swatch{width:12px;height:12px;border-radius:3px;flex:0 0 12px}
   .swatch.line{height:0;border-top-width:2px;border-top-style:solid;border-radius:0;width:18px}
   .swatch.dash{border-top-style:dashed}
@@ -122,7 +117,7 @@
     font-family:var(--mono);
     font-size:11px;
     border:1px solid var(--line);
-    background:var(--panel-2);
+    background:var(--panel);
     color:var(--ink-dim);
     padding:5px 9px;
     border-radius:20px;
@@ -131,15 +126,15 @@
     transition:all .12s ease;
   }
   .chip:hover{border-color:var(--ink-faint);color:var(--ink)}
-  .chip[aria-pressed="true"]{background:var(--focus);border-color:var(--focus);color:#1a1205;font-weight:600}
+  .chip[aria-pressed="true"]{background:var(--focus);border-color:var(--focus);color:#ffffff;font-weight:600}
 
   /* ---------- Nodes ---------- */
   .node{cursor:pointer}
   .node .node-body{transition:opacity .18s ease, stroke-width .1s ease}
-  .node .letter{font-family:var(--sans);font-weight:700;fill:#0e1418;text-anchor:middle;dominant-baseline:central}
+  .node .letter{font-family:var(--sans);font-weight:700;fill:#ffffff;text-anchor:middle;dominant-baseline:central}
   .node .label{font-family:var(--sans);font-size:12px;fill:var(--ink);text-anchor:middle;font-weight:500}
   .node .domain{font-family:var(--mono);font-size:10px;fill:var(--ink-faint);text-anchor:middle}
-  .node.dim{opacity:0.16}
+  .node.dim{opacity:0.22}
   .node.hot .node-body{stroke:var(--focus);stroke-width:3}
   .ery-hub circle{fill:var(--panel-2);stroke:var(--line);stroke-width:1.5;stroke-dasharray:3 4}
   .ery-hub text{font-family:var(--mono);font-size:11px;fill:var(--ink-dim);text-anchor:middle;dominant-baseline:central;letter-spacing:0.05em}
@@ -209,7 +204,7 @@
     font-family:var(--sans);font-size:13px;font-weight:600;border-radius:7px;cursor:pointer;
     padding:9px 15px;border:1px solid transparent;transition:filter .12s ease;
   }
-  .btn-primary{background:var(--focus);color:#1a1205}
+  .btn-primary{background:var(--focus);color:#ffffff}
   .btn-primary:hover{filter:brightness(1.08)}
   .btn-ghost{background:transparent;border-color:var(--line);color:var(--ink-dim)}
   .btn-ghost:hover{border-color:var(--ink-faint);color:var(--ink)}
@@ -230,7 +225,7 @@
   .rec-top{display:flex;align-items:center;gap:10px}
   .rec-badge{
     width:30px;height:30px;border-radius:7px;flex:0 0 30px;display:flex;align-items:center;justify-content:center;
-    font-weight:700;font-size:15px;color:#0e1418;
+    font-weight:700;font-size:15px;color:#ffffff;
   }
   .rec-name{font-size:14px;font-weight:600}
   .rec-dom{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint)}
@@ -238,7 +233,7 @@
   .rec-why{font-size:12px;color:var(--ink-dim);line-height:1.5;margin:9px 0 0}
   .rec-why .hit{color:var(--focus);font-weight:600}
   .rec-order{font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex:0 0 auto}
-  .chain{margin:6px 0 0;padding:10px 12px;border-left:2px solid var(--line);background:rgba(27,38,46,0.5);border-radius:0 6px 6px 0}
+  .chain{margin:6px 0 0;padding:10px 12px;border-left:2px solid var(--line);background:var(--panel-2);border-radius:0 6px 6px 0}
   .chain-step{display:flex;align-items:center;gap:8px;font-size:12px;padding:3px 0;color:var(--ink-dim)}
   .chain-arrow{font-family:var(--mono);font-size:12px}
   .chain-arrow.auto{color:var(--edge-auto)}
@@ -251,8 +246,8 @@
   @media (max-width:920px){
     .wrap{flex-direction:column}
     .side{width:100%;flex:0 0 auto;border-left:none;border-top:1px solid var(--line);position:static;max-height:none}
-    .stage{min-height:520px}
-    svg{min-height:520px}
+    .stage{min-height:auto}
+    svg{min-height:440px}
     .masthead-meta{gap:18px}
   }
   @media (prefers-reduced-motion:reduce){
@@ -276,30 +271,6 @@
 
 <div class="wrap">
   <div class="stage">
-    <div class="controls">
-      <div class="legend">
-        <h3>Peran arsitektur</h3>
-        <div class="row"><span class="swatch" style="background:var(--router)"></span> Router (inisiasi otonom)</div>
-        <div class="row"><span class="swatch" style="background:var(--bilateral)"></span> Bilateral-only emitter</div>
-        <div class="row"><span class="swatch" style="background:var(--terminal)"></span> Terminal</div>
-        <div class="row"><span class="swatch" style="background:var(--meta)"></span> Meta · non-routing</div>
-      </div>
-      <div class="legend">
-        <h3>Jenis edge</h3>
-        <div class="row"><span class="swatch line" style="border-top-color:var(--edge-auto)"></span> Otonom (agen mengemisi)</div>
-        <div class="row"><span class="swatch line dash" style="border-top-color:var(--edge-ery)"></span> Ery-mediated</div>
-        <div class="row"><span class="swatch line dash" style="border-top-color:var(--edge-generic)"></span> Reception generik / pre-established</div>
-      </div>
-      <div class="legend">
-        <h3>Saring peran</h3>
-        <div class="filters" id="filters">
-          <span class="chip" data-k="router" aria-pressed="false">router</span>
-          <span class="chip" data-k="bilateral" aria-pressed="false">bilateral</span>
-          <span class="chip" data-k="terminal" aria-pressed="false">terminal</span>
-          <span class="chip" data-k="meta" aria-pressed="false">meta</span>
-        </div>
-      </div>
-    </div>
     <svg id="graph" viewBox="0 0 900 760" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagram jaringan 12 agen">
       <defs>
         <marker id="arrow-auto" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -315,6 +286,34 @@
       <g id="edges"></g>
       <g id="nodes"></g>
     </svg>
+    <div class="legendbar">
+      <div class="legend">
+        <h3>Peran arsitektur</h3>
+        <div class="legend-rows">
+          <span class="row"><span class="swatch" style="background:var(--router)"></span> Router (inisiasi otonom)</span>
+          <span class="row"><span class="swatch" style="background:var(--bilateral)"></span> Bilateral-only emitter</span>
+          <span class="row"><span class="swatch" style="background:var(--terminal)"></span> Terminal</span>
+          <span class="row"><span class="swatch" style="background:var(--meta)"></span> Meta · non-routing</span>
+        </div>
+      </div>
+      <div class="legend">
+        <h3>Jenis edge</h3>
+        <div class="legend-rows">
+          <span class="row"><span class="swatch line" style="border-top-color:var(--edge-auto)"></span> Otonom (agen mengemisi)</span>
+          <span class="row"><span class="swatch line dash" style="border-top-color:var(--edge-ery)"></span> Ery-mediated</span>
+          <span class="row"><span class="swatch line dash" style="border-top-color:var(--edge-generic)"></span> Reception generik / pre-established</span>
+        </div>
+      </div>
+      <div class="legend">
+        <h3>Saring peran</h3>
+        <div class="filters" id="filters">
+          <span class="chip" data-k="router" aria-pressed="false">router</span>
+          <span class="chip" data-k="bilateral" aria-pressed="false">bilateral</span>
+          <span class="chip" data-k="terminal" aria-pressed="false">terminal</span>
+          <span class="chip" data-k="meta" aria-pressed="false">meta</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <aside class="side">
@@ -494,9 +493,9 @@ EDGES.forEach(e=>{
   const color = e.tier==="auto"?"var(--edge-auto)": e.tier==="ery"?"var(--edge-ery)":"var(--edge-generic)";
   const dash  = (e.tier==="auto")?"none":(e.tier==="pre"?"1 6":"5 5");
   const mk = e.tier==="auto"?"url(#arrow-auto)": e.tier==="ery"?"url(#arrow-ery)":"url(#arrow-generic)";
-  const opacity = e.tier==="undef"?0.28:0.7;
+  const opacity = e.tier==="undef"?0.4:0.85;
 
-  const path=el('path',{class:'edge',d,stroke:color,'stroke-width':1.8,'stroke-dasharray':dash,'marker-end':mk,opacity});
+  const path=el('path',{class:'edge',d,stroke:color,'stroke-width':2.1,'stroke-dasharray':dash,'marker-end':mk,opacity});
   if(e.bidir) path.setAttribute('marker-start', mk);
   const hit =el('path',{class:'edge-hit',d});
   hit.addEventListener('click',(ev)=>{ev.stopPropagation();selectEdge(e);});
@@ -511,7 +510,7 @@ const nodeEls = {};
 Object.keys(AGENTS).forEach(id=>{
   const a=AGENTS[id], p=POS[id];
   const g=el('g',{class:'node',tabindex:0,'data-id':id,role:'button','aria-label':`Agen ${id} — ${a.name}`});
-  const body=el('circle',{class:'node-body',cx:p.x,cy:p.y,r:R,fill:KIND_COLOR[a.kind],stroke:'#0e1418','stroke-width':2});
+  const body=el('circle',{class:'node-body',cx:p.x,cy:p.y,r:R,fill:KIND_COLOR[a.kind],stroke:'#ffffff','stroke-width':2.5});
   const letter=el('text',{class:'letter','font-size':'22px',x:p.x,y:p.y}); letter.textContent=id;
   const label=el('text',{class:'label',x:p.x,y:p.y+R+16}); label.textContent=a.name;
   const dom=el('text',{class:'domain',x:p.x,y:p.y+R+31}); dom.textContent=a.domain;
@@ -672,7 +671,7 @@ const CHAINS = {
   I:[{to:"__ANY__",eid:"E-13",tier:"ery",label:"→ hasil evaluasi ke agen peminta"}]
 };
 
-const KIND_HEX={router:"#e0a13c",bilateral:"#4bb3a7",terminal:"#6f8aa8",meta:"#a77bb8"};
+const KIND_HEX={router:"#c67f16",bilateral:"#1f8d80",terminal:"#4a6a8c",meta:"#8a52a0"};
 const ROLE_TAG_STYLE={
   router:'background:rgba(224,161,60,0.16);color:var(--router)',
   bilateral:'background:rgba(75,179,167,0.16);color:var(--bilateral)',
